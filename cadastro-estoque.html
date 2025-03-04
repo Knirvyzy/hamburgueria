@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Estoque</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-start;
+            margin: 10px 0;
+        }
+        .nav-buttons button {
+            display: flex;
+            align-items: center;
+            padding: 5px 15px;
+            margin-right: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav-buttons button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -12,6 +35,18 @@
     </header>
 
     <main>
+        <!-- Botões de Navegação -->
+        <div class="nav-buttons">
+            <button onclick="window.history.back()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Icons_Back_button_Arrow.svg" alt="Retornar">
+                Retornar
+            </button>
+            <button onclick="window.location.href='index.html'">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Home_icon.svg" alt="Tela Inicial">
+                Tela Inicial
+            </button>
+        </div>
+
         <form id="cadastroEstoque">
             <label for="item">Item:</label>
             <input type="text" id="item" name="item" required>

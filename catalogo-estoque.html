@@ -15,7 +15,7 @@
             border: 1px solid #ccc;
             padding: 8px;
             text-align: center;
-            white-space: nowrap; /* Impede quebra de texto */
+            white-space: nowrap;
         }
         th {
             background-color: #f4f4f4;
@@ -36,6 +36,29 @@
             padding: 5px 10px;
             margin-left: 10px;
         }
+
+        /* Estilos para os botões de navegação */
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-start;
+            margin: 10px 0;
+        }
+        .nav-buttons button {
+            display: flex;
+            align-items: center;
+            padding: 5px 15px;
+            margin-right: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav-buttons button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -44,6 +67,18 @@
     </header>
 
     <main>
+        <!-- Botões de Navegação -->
+        <div class="nav-buttons">
+            <button onclick="window.history.back()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Icons_Back_button_Arrow.svg" alt="Retornar">
+                Retornar
+            </button>
+            <button onclick="window.location.href='index.html'">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Home_icon.svg" alt="Tela Inicial">
+                Tela Inicial
+            </button>
+        </div>
+
         <div class="filter-container">
             <input type="text" id="filtro" placeholder="Filtrar itens..." onkeyup="filtrarItens()">
             <button onclick="excluirSelecionados()">Excluir Selecionados</button>
@@ -52,6 +87,7 @@
         <table id="estoqueTabela">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th><input type="checkbox" id="selecionarTodos" onclick="selecionarTodos()"></th>
                     <th>Item</th>
                     <th>Descrição</th>
@@ -70,6 +106,14 @@
     </main>
 
     <script>
+        // Recupera o último ID salvo ou inicia em 1
+        function getNovoID() {
+            let ultimoID = localStorage.getItem('ultimoID') || 0;
+            ultimoID = parseInt(ultimoID) + 1;
+            localStorage.setItem('ultimoID', ultimoID);
+            return ultimoID;
+        }
+
         // Função para carregar os itens do estoque
         function carregarEstoque() {
             const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
@@ -77,14 +121,14 @@
             tabelaBody.innerHTML = ''; // Limpa a tabela
 
             if (estoque.length === 0) {
-                tabelaBody.innerHTML = '<tr><td colspan="9">Nenhum item no estoque.</td></tr>';
+                tabelaBody.innerHTML = '<tr><td colspan="10">Nenhum item no estoque.</td></tr>';
                 return;
             }
 
-            // Preencher tabela com os itens
             estoque.forEach((item, index) => {
                 const linha = document.createElement('tr');
                 linha.innerHTML = `
+                    <td>${item.id}</td>
                     <td><input type="checkbox" class="selecionar-item" data-index="${index}"></td>
                     <td>${item.item}</td>
                     <td>${item.descricao}</td>
@@ -119,16 +163,13 @@
                 return;
             }
 
-            // Pegando os índices dos itens selecionados
             let indicesParaRemover = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index')));
 
-            // Filtrar os itens que não foram selecionados
             estoque = estoque.filter((_, index) => !indicesParaRemover.includes(index));
 
-            // Atualiza o localStorage
             localStorage.setItem('estoque', JSON.stringify(estoque));
 
-            carregarEstoque(); // Recarrega a tabela
+            carregarEstoque();
         }
 
         // Função para selecionar todos os itens

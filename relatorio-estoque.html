@@ -20,6 +20,16 @@
         th {
             background-color: #f4f4f4;
         }
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -47,13 +57,18 @@
                     <th>Quantidade</th>
                     <th>Unidade</th>
                     <th>Valor</th>
-                    <th>Lote</th> <!-- Alterado para "Lote" -->
+                    <th>Lote</th>
                 </tr>
             </thead>
             <tbody id="relatorioLista">
                 <!-- Os dados filtrados serão exibidos aqui -->
             </tbody>
         </table>
+
+        <div class="button-container">
+            <button onclick="history.back()">Retornar</button>
+            <button onclick="window.location.href='index.html'">Tela Inicial</button>
+        </div>
     </main>
 
     <script>
@@ -71,7 +86,7 @@
 
             const hoje = new Date();
             let itensFiltrados = estoque.filter(item => {
-                const dataCadastro = new Date(item.lote); // Alterado para "lote"
+                const dataCadastro = new Date(item.lote);
                 
                 switch (filtro) {
                     case 'diario':
@@ -105,7 +120,7 @@
                     <td>${item.quantidade}</td>
                     <td>${item.unidade}</td>
                     <td>${item.valor}</td>
-                    <td>${item.lote}</td> <!-- Alterado para "lote" -->
+                    <td>${item.lote}</td>
                 `;
                 tabelaBody.appendChild(linha);
             });

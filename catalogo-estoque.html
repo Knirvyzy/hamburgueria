@@ -20,10 +20,10 @@
         th {
             background-color: #f4f4f4;
         }
-        .delete-btn {
-            color: red;
+        .delete-icon {
             cursor: pointer;
-            font-weight: bold;
+            width: 20px; /* Ajuste o tamanho conforme necessário */
+            height: 20px;
         }
     </style>
 </head>
@@ -33,24 +33,17 @@
     </header>
 
     <main>
-        <button onclick="excluirSelecionados()">Excluir Selecionados</button> <!-- Botão para excluir itens selecionados -->
-        <br><br>
-        <label for="filtro">Filtrar por item: </label>
-        <input type="text" id="filtro" placeholder="Digite o nome do item" onkeyup="filtrarItens()">
-        <br><br>
-
         <table id="estoqueTabela">
             <thead>
                 <tr>
-                    <th><input type="checkbox" id="selectAll" onclick="selecionarTodos()"> </th> <!-- Caixa de seleção para todos -->
                     <th>Item</th>
                     <th>Descrição</th>
                     <th>Categoria</th>
                     <th>Quantidade</th>
                     <th>Unidade</th>
                     <th>Valor</th>
-                    <th>Lote</th> <!-- Alterado para "Lote" -->
-                    <th>Ação</th> <!-- Coluna para a ação de excluir -->
+                    <th>Lote</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody id="estoqueLista">
@@ -75,7 +68,6 @@
             estoque.forEach((item, index) => {
                 const linha = document.createElement('tr');
                 linha.innerHTML = `
-                    <td><input type="checkbox" class="checkbox-item" data-index="${index}"></td> <!-- Caixa de seleção individual -->
                     <td>${item.item}</td>
                     <td>${item.descricao}</td>
                     <td>${item.categoria}</td>
@@ -83,54 +75,20 @@
                     <td>${item.unidade}</td>
                     <td>${item.valor}</td>
                     <td>${item.lote}</td>
-                    <td><span class="delete-btn" onclick="removerItem(${index})">🗑️</span></td> <!-- Botão de excluir -->
+                    <td>
+                        <img src="lixeira-aberta.png" alt="Excluir" class="delete-icon" onclick="excluirItem(${index})">
+                    </td>
                 `;
                 tabelaBody.appendChild(linha);
             });
         }
 
-        // Função para excluir um item
-        function removerItem(index) {
+        // Função para excluir um item do estoque
+        function excluirItem(index) {
             let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            estoque.splice(index, 1); // Remove o item do estoque
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            carregarEstoque(); // Atualiza a tabela
-        }
-
-        // Função para excluir os itens selecionados
-        function excluirSelecionados() {
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            const checkboxes = document.querySelectorAll('.checkbox-item:checked'); // Seleciona todos os itens marcados
-
-            checkboxes.forEach(checkbox => {
-                const index = checkbox.getAttribute('data-index');
-                estoque.splice(index, 1); // Remove o item do estoque
-            });
-
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            carregarEstoque(); // Atualiza a tabela
-        }
-
-        // Função para selecionar/deselecionar todos os itens
-        function selecionarTodos() {
-            const selectAll = document.getElementById('selectAll');
-            const checkboxes = document.querySelectorAll('.checkbox-item');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAll.checked; // Marca ou desmarca todos
-            });
-        }
-
-        // Função para filtrar os itens pela caixa de texto
-        function filtrarItens() {
-            const filtro = document.getElementById('filtro').value.toLowerCase();
-            const rows = document.querySelectorAll('#estoqueLista tr');
-            rows.forEach(row => {
-                const itemCell = row.cells[1]; // A célula do item
-                if (itemCell) {
-                    const itemText = itemCell.textContent.toLowerCase();
-                    row.style.display = itemText.includes(filtro) ? '' : 'none'; // Exibe ou oculta a linha
-                }
-            });
+            estoque.splice(index, 1); // Remove o item do array
+            localStorage.setItem('estoque', JSON.stringify(estoque)); // Atualiza o localStorage
+            carregarEstoque(); // Recarrega a tabela
         }
 
         // Carregar estoque ao carregar a página

@@ -22,8 +22,19 @@
         }
         .delete-icon {
             cursor: pointer;
-            width: 20px; /* Ajuste o tamanho conforme necessário */
+            width: 20px;
             height: 20px;
+        }
+        .filter-container {
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            padding: 5px 10px;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -33,9 +44,15 @@
     </header>
 
     <main>
+        <div class="filter-container">
+            <input type="text" id="filtro" placeholder="Filtrar itens..." onkeyup="filtrarItens()">
+            <button onclick="excluirSelecionados()">Excluir Selecionados</button>
+        </div>
+
         <table id="estoqueTabela">
             <thead>
                 <tr>
+                    <th><input type="checkbox" id="selecionarTodos" onclick="selecionarTodos()"></th>
                     <th>Item</th>
                     <th>Descrição</th>
                     <th>Categoria</th>
@@ -53,21 +70,22 @@
     </main>
 
     <script>
-        // Função para preencher a tabela com os dados do estoque
+        // Função para carregar os itens do estoque
         function carregarEstoque() {
             const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             const tabelaBody = document.getElementById('estoqueLista');
-            tabelaBody.innerHTML = ''; // Limpar tabela antes de preencher
+            tabelaBody.innerHTML = ''; // Limpa a tabela
 
             if (estoque.length === 0) {
-                tabelaBody.innerHTML = '<tr><td colspan="8">Nenhum item no estoque.</td></tr>';
+                tabelaBody.innerHTML = '<tr><td colspan="9">Nenhum item no estoque.</td></tr>';
                 return;
             }
 
-            // Preencher tabela com os itens do estoque
+            // Preencher tabela com os itens
             estoque.forEach((item, index) => {
                 const linha = document.createElement('tr');
                 linha.innerHTML = `
+                    <td><input type="checkbox" class="selecionar-item" data-index="${index}"></td>
                     <td>${item.item}</td>
                     <td>${item.descricao}</td>
                     <td>${item.categoria}</td>
@@ -83,7 +101,7 @@
             });
         }
 
-        // Função para excluir um item do estoque
+        // Função para excluir um item individualmente
         function excluirItem(index) {
             let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             estoque.splice(index, 1); // Remove o item do array
@@ -91,7 +109,47 @@
             carregarEstoque(); // Recarrega a tabela
         }
 
-        // Carregar estoque ao carregar a página
+        // Função para excluir múltiplos itens selecionados
+        function excluirSelecionados() {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            const checkboxes = document.querySelectorAll('.selecionar-item:checked');
+
+            if (checkboxes.length === 0) {
+                alert('Nenhum item selecionado!');
+                return;
+            }
+
+            // Pegando os índices dos itens selecionados
+            let indicesParaRemover = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index')));
+
+            // Filtrar os itens que não foram selecionados
+            estoque = estoque.filter((_, index) => !indicesParaRemover.includes(index));
+
+            // Atualiza o localStorage
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+
+            carregarEstoque(); // Recarrega a tabela
+        }
+
+        // Função para selecionar todos os itens
+        function selecionarTodos() {
+            const checkboxes = document.querySelectorAll('.selecionar-item');
+            const selecionarTodosCheckbox = document.getElementById('selecionarTodos');
+            checkboxes.forEach(cb => cb.checked = selecionarTodosCheckbox.checked);
+        }
+
+        // Função para filtrar os itens na tabela
+        function filtrarItens() {
+            const filtro = document.getElementById('filtro').value.toLowerCase();
+            const linhas = document.querySelectorAll('#estoqueLista tr');
+
+            linhas.forEach(linha => {
+                const textoLinha = linha.innerText.toLowerCase();
+                linha.style.display = textoLinha.includes(filtro) ? '' : 'none';
+            });
+        }
+
+        // Carregar estoque ao iniciar a página
         window.onload = carregarEstoque;
     </script>
 </body>

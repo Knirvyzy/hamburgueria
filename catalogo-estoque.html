@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Estoque</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap; /* Impede quebra de texto */
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -21,42 +37,16 @@
                     <th>Quantidade</th>
                     <th>Unidade</th>
                     <th>Valor</th>
+                    <th>Lote</th> <!-- Nova coluna para o Lote -->
                 </tr>
             </thead>
             <tbody id="estoqueLista">
-                <!-- Os itens do estoque serão listados aqui -->
+                <!-- Os itens cadastrados serão inseridos aqui -->
             </tbody>
         </table>
     </main>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const estoqueLista = document.getElementById('estoqueLista');
-
-            // Recuperar os itens do localStorage
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-
-            // Verifica se há itens cadastrados
-            if (estoque.length === 0) {
-                estoqueLista.innerHTML = '<tr><td colspan="6">Nenhum item cadastrado no estoque.</td></tr>';
-                return;
-            }
-
-            // Adicionar os itens à tabela
-            estoque.forEach(item => {
-                const linha = document.createElement('tr');
-                linha.innerHTML = `
-                    <td>${item.item}</td>
-                    <td>${item.descricao}</td>
-                    <td>${item.categoria}</td>
-                    <td>${item.quantidade}</td>
-                    <td>${item.unidade}</td>
-                    <td>${item.valor}</td>
-                `;
-                estoqueLista.appendChild(linha);
-            });
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
 

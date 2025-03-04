@@ -8,7 +8,12 @@ document.getElementById('cadastroEstoque').addEventListener('submit', function(e
     const categoria = document.getElementById('categoria').value;
     const quantidade = document.getElementById('quantidade').value;
     const unidade = document.getElementById('unidade').value;
-    const valor = document.getElementById('valor').value;
+    let valor = document.getElementById('valor').value;
+
+    // Formatar o valor como moeda
+    valor = parseFloat(valor.replace(',', '.')).toFixed(2); // Garantir que o valor tenha 2 casas decimais
+    valor = valor.replace('.', ','); // Substituir o ponto por vírgula para o formato brasileiro
+    valor = `R$ ${valor}`;
 
     const dataCadastro = new Date();
     const lote = dataCadastro.toLocaleDateString('pt-BR').replace(/\//g, '');
@@ -31,11 +36,9 @@ document.getElementById('cadastroEstoque').addEventListener('submit', function(e
             <li>Descrição: ${descricao}</li>
             <li>Categoria: ${categoria}</li>
             <li>Quantidade: ${quantidade} ${unidade}</li>
-            <li>Valor: R$ ${valor}</li>
+            <li>Valor: ${valor}</li>
             <li>Lote: ${lote}</li>
         </ul>
     `;
 });
-
-
 

@@ -6,26 +6,19 @@
     <title>Cadastro de Estoque</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .nav-buttons {
-            display: flex;
-            justify-content: flex-start;
-            margin: 10px 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
         }
-        .nav-buttons button {
-            display: flex;
-            align-items: center;
-            padding: 5px 15px;
-            margin-right: 10px;
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap; /* Impede quebra de texto */
         }
-        .nav-buttons button img {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
+        th {
+            background-color: #f4f4f4;
         }
     </style>
 </head>
@@ -35,18 +28,6 @@
     </header>
 
     <main>
-        <!-- Botões de Navegação -->
-        <div class="nav-buttons">
-            <button onclick="window.history.back()">
-                <img src="imagens/Retornar.png" alt="Retornar">
-                Retornar
-            </button>
-            <button onclick="window.location.href='index.html'">
-                <img src="imagens/home.png" alt="Tela Inicial">
-                Tela Inicial
-            </button>
-        </div>
-
         <form id="cadastroEstoque">
             <label for="item">Item:</label>
             <input type="text" id="item" name="item" required>
@@ -67,18 +48,18 @@
 
             <label for="unidade">Unidade:</label>
             <select id="unidade" name="unidade">
-                <option value="kg">KG</option>
-                <option value="g">G</option>
-                <option value="l">L</option>
-                <option value="ml">ML</option>
-                <option value="un">UN</option>
-                <option value="pct">PCT</option>
-                <option value="rol">ROL</option>
-                <option value="kit">KIT</option>
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="l">l</option>
+                <option value="ml">ml</option>
+                <option value="un">un</option>
+                <option value="pct">pct</option>
+                <option value="rol">rol</option>
+                <option value="kit">kit</option>
             </select>
 
             <label for="valor">Valor:</label>
-            <input type="text" id="valor" name="valor" required>
+            <input type="number" id="valor" name="valor" min="0" step="0.01" required>
 
             <button type="submit">Cadastrar</button>
         </form>
@@ -98,15 +79,14 @@
             let valor = document.getElementById('valor').value;
 
             // Formatar o valor como moeda
-            valor = parseFloat(valor.replace(',', '.')).toFixed(2);
-            valor = valor.replace('.', ',');
+            valor = parseFloat(valor.replace(',', '.')).toFixed(2); // Garantir que o valor tenha 2 casas decimais
+            valor = valor.replace('.', ','); // Substituir o ponto por vírgula para o formato brasileiro
             valor = `R$ ${valor}`;
 
             const dataCadastro = new Date();
             const lote = dataCadastro.toLocaleDateString('pt-BR').replace(/\//g, '');
 
             const itemCadastro = {
-                id: getNovoID(),
                 item,
                 descricao,
                 categoria,
@@ -116,16 +96,11 @@
                 lote,
             };
 
-            // Recuperar os itens cadastrados no localStorage
+            // Armazenar no localStorage
             let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-
-            // Adicionar o novo item ao array
             estoque.push(itemCadastro);
-
-            // Salvar novamente no localStorage
             localStorage.setItem('estoque', JSON.stringify(estoque));
 
-            // Exibir mensagem de sucesso
             const respostaCadastro = document.getElementById('respostaCadastro');
             respostaCadastro.innerHTML = `
                 <p>Item Cadastrado com Sucesso:</p>
@@ -138,11 +113,9 @@
                     <li>Lote: ${lote}</li>
                 </ul>
             `;
-
-            // Limpar o formulário após cadastro
-            document.getElementById('cadastroEstoque').reset();
         });
     </script>
+
 </body>
 </html>
 

@@ -15,20 +15,44 @@
             border: 1px solid #ccc;
             padding: 8px;
             text-align: center;
-            white-space: nowrap; /* Impede quebra de texto */
+            white-space: nowrap;
         }
         th {
             background-color: #f4f4f4;
         }
-        .button-container {
-            margin-top: 20px;
-            text-align: center;
+        .filter-container {
+            margin-bottom: 10px;
         }
-        .button-container button {
-            padding: 10px 20px;
-            margin: 5px;
-            font-size: 16px;
+        input[type="text"], select {
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            padding: 5px 10px;
+            margin-left: 10px;
+        }
+
+        /* Estilos para os botões de navegação */
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-start;
+            margin: 10px 0;
+        }
+        .nav-buttons button {
+            display: flex;
+            align-items: center;
+            padding: 5px 15px;
+            margin-right: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+        }
+        .nav-buttons button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -38,19 +62,34 @@
     </header>
 
     <main>
-        <label for="filtroData">Filtrar por:</label>
-        <select id="filtroData">
-            <option value="atual">Estoque Atual</option>
-            <option value="diario">Diário</option>
-            <option value="semanal">Semanal</option>
-            <option value="mensal">Mensal</option>
-            <option value="anual">Anual</option>
-        </select>
-        <button onclick="gerarRelatorio()">Gerar Relatório</button>
+        <!-- Botões de Navegação -->
+        <div class="nav-buttons">
+            <button onclick="window.history.back()">
+                <img src="imagens/Retornar.png" alt="Retornar">
+                Retornar
+            </button>
+            <button onclick="window.location.href='index.html'">
+                <img src="imagens/home.png" alt="Tela Inicial">
+                Tela Inicial
+            </button>
+        </div>
+
+        <div class="filter-container">
+            <label for="filtroData">Filtrar por:</label>
+            <select id="filtroData">
+                <option value="atual">Estoque Atual</option>
+                <option value="diario">Diário</option>
+                <option value="semanal">Semanal</option>
+                <option value="mensal">Mensal</option>
+                <option value="anual">Anual</option>
+            </select>
+            <button onclick="gerarRelatorio()">Gerar Relatório</button>
+        </div>
 
         <table id="relatorioTabela">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Item</th>
                     <th>Descrição</th>
                     <th>Categoria</th>
@@ -64,23 +103,17 @@
                 <!-- Os dados filtrados serão exibidos aqui -->
             </tbody>
         </table>
-
-        <div class="button-container">
-            <button onclick="history.back()">Retornar</button>
-            <button onclick="window.location.href='index.html'">Tela Inicial</button>
-        </div>
     </main>
 
     <script>
-        // Função para gerar o relatório com base no filtro selecionado
         function gerarRelatorio() {
             const filtro = document.getElementById('filtroData').value;
-            const estoque = JSON.parse(localStorage.getItem('estoque')) || []; // Recuperar os dados do localStorage
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             const tabelaBody = document.getElementById('relatorioLista');
-            tabelaBody.innerHTML = ''; // Limpar tabela antes de preencher
-            
+            tabelaBody.innerHTML = '';
+
             if (estoque.length === 0) {
-                tabelaBody.innerHTML = '<tr><td colspan="7">Nenhum item no estoque.</td></tr>';
+                tabelaBody.innerHTML = '<tr><td colspan="8">Nenhum item no estoque.</td></tr>';
                 return;
             }
 
@@ -101,19 +134,19 @@
                         return dataCadastro.getFullYear() === hoje.getFullYear();
                     case 'atual':
                     default:
-                        return true; // Mostrar todos os itens
+                        return true;
                 }
             });
 
             if (itensFiltrados.length === 0) {
-                tabelaBody.innerHTML = '<tr><td colspan="7">Nenhum item encontrado para esse período.</td></tr>';
+                tabelaBody.innerHTML = '<tr><td colspan="8">Nenhum item encontrado para esse período.</td></tr>';
                 return;
             }
 
-            // Preencher tabela com os itens filtrados
             itensFiltrados.forEach(item => {
                 const linha = document.createElement('tr');
                 linha.innerHTML = `
+                    <td>${item.id}</td>
                     <td>${item.item}</td>
                     <td>${item.descricao}</td>
                     <td>${item.categoria}</td>

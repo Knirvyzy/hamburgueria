@@ -43,7 +43,7 @@
             </select>
 
             <label for="valor">Valor:</label>
-            <input type="number" id="valor" name="valor" min="0" step="0.01" required>
+            <input type="text" id="valor" name="valor" required>
 
             <button type="submit">Cadastrar</button>
         </form>
@@ -51,8 +51,62 @@
         <div id="respostaCadastro"></div>
     </main>
 
-    <script src="script.js"></script>
+    <script>
+        document.getElementById('cadastroEstoque').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const item = document.getElementById('item').value;
+            const descricao = document.getElementById('descricao').value;
+            const categoria = document.getElementById('categoria').value;
+            const quantidade = document.getElementById('quantidade').value;
+            const unidade = document.getElementById('unidade').value;
+            let valor = document.getElementById('valor').value;
+
+            // Formatar o valor como moeda
+            valor = parseFloat(valor.replace(',', '.')).toFixed(2);
+            valor = valor.replace('.', ',');
+            valor = `R$ ${valor}`;
+
+            const dataCadastro = new Date();
+            const lote = dataCadastro.toLocaleDateString('pt-BR').replace(/\//g, '');
+
+            const itemCadastro = {
+                item,
+                descricao,
+                categoria,
+                quantidade,
+                unidade,
+                valor,
+                lote,
+            };
+
+            // Recuperar os itens cadastrados no localStorage
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+
+            // Adicionar o novo item ao array
+            estoque.push(itemCadastro);
+
+            // Salvar novamente no localStorage
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+
+            // Exibir mensagem de sucesso
+            const respostaCadastro = document.getElementById('respostaCadastro');
+            respostaCadastro.innerHTML = `
+                <p>Item Cadastrado com Sucesso:</p>
+                <ul>
+                    <li>Item: ${item}</li>
+                    <li>Descrição: ${descricao}</li>
+                    <li>Categoria: ${categoria}</li>
+                    <li>Quantidade: ${quantidade} ${unidade}</li>
+                    <li>Valor: ${valor}</li>
+                    <li>Lote: ${lote}</li>
+                </ul>
+            `;
+
+            // Limpar o formulário após cadastro
+            document.getElementById('cadastroEstoque').reset();
+        });
+    </script>
 </body>
 </html>
-
 

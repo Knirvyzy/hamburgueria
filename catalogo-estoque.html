@@ -29,9 +29,34 @@
         </table>
     </main>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const estoqueLista = document.getElementById('estoqueLista');
+
+            // Recuperar os itens do localStorage
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+
+            // Verifica se há itens cadastrados
+            if (estoque.length === 0) {
+                estoqueLista.innerHTML = '<tr><td colspan="6">Nenhum item cadastrado no estoque.</td></tr>';
+                return;
+            }
+
+            // Adicionar os itens à tabela
+            estoque.forEach(item => {
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+                    <td>${item.item}</td>
+                    <td>${item.descricao}</td>
+                    <td>${item.categoria}</td>
+                    <td>${item.quantidade}</td>
+                    <td>${item.unidade}</td>
+                    <td>${item.valor}</td>
+                `;
+                estoqueLista.appendChild(linha);
+            });
+        });
+    </script>
 </body>
 </html>
-
-
 

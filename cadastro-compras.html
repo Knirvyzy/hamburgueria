@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Compras</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Cadastro de Compras</h1>
+    </header>
+
+    <main>
+        <form id="cadastroCompras">
+            <label for="itemCompra">Item Comprado:</label>
+            <input type="text" id="itemCompra" name="itemCompra" required>
+
+            <label for="quantidadeCompra">Quantidade Comprada:</label>
+            <input type="number" id="quantidadeCompra" name="quantidadeCompra" min="1" required>
+
+            <label for="valorCompra">Valor:</label>
+            <input type="number" id="valorCompra" name="valorCompra" min="0" step="0.01" required>
+
+            <button type="submit">Cadastrar Compra</button>
+        </form>
+
+        <div id="respostaCompra"></div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+

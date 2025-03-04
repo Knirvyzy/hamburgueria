@@ -37,7 +37,7 @@
                     <th>Quantidade</th>
                     <th>Unidade</th>
                     <th>Valor</th>
-                    <th>Lote</th> <!-- Nova coluna para o Lote -->
+                    <th>Data Cadastro</th> <!-- Alterado para 'Data Cadastro' -->
                 </tr>
             </thead>
             <tbody id="estoqueLista">
@@ -46,7 +46,37 @@
         </table>
     </main>
 
-    <script src="script.js"></script>
+    <script>
+        // Função para preencher a tabela com os dados do estoque
+        function carregarEstoque() {
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            const tabelaBody = document.getElementById('estoqueLista');
+            tabelaBody.innerHTML = ''; // Limpar tabela antes de preencher
+
+            if (estoque.length === 0) {
+                tabelaBody.innerHTML = '<tr><td colspan="7">Nenhum item no estoque.</td></tr>';
+                return;
+            }
+
+            // Preencher tabela com os itens do estoque
+            estoque.forEach(item => {
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+                    <td>${item.item}</td>
+                    <td>${item.descricao}</td>
+                    <td>${item.categoria}</td>
+                    <td>${item.quantidade}</td>
+                    <td>${item.unidade}</td>
+                    <td>${item.valor}</td>
+                    <td>${item.dataCadastro}</td> <!-- Aqui mostra a data de cadastro -->
+                `;
+                tabelaBody.appendChild(linha);
+            });
+        }
+
+        // Carregar estoque ao carregar a página
+        window.onload = carregarEstoque;
+    </script>
 </body>
 </html>
 

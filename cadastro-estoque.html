@@ -87,6 +87,19 @@
     </main>
 
     <script>
+        // Função para gerar um novo ID reutilizável
+        function getNovoID() {
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            const ids = estoque.map(item => item.id);
+            
+            // Procurar pelo menor ID disponível
+            let novoID = 1;
+            while (ids.includes(novoID)) {
+                novoID++;
+            }
+            return novoID;
+        }
+
         document.getElementById('cadastroEstoque').addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -106,7 +119,7 @@
             const lote = dataCadastro.toLocaleDateString('pt-BR').replace(/\//g, '');
 
             const itemCadastro = {
-                id: getNovoID(),
+                id: getNovoID(),  // Gerar um novo ID reutilizável
                 item,
                 descricao,
                 categoria,

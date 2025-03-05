@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Produto</title>
+    <title>Catálogo de Produtos</title>
     <link rel="stylesheet" href="style.css">
     <style>
         table {
@@ -24,22 +24,6 @@
             cursor: pointer;
             width: 20px;
             height: 20px;
-        }
-        .form-container {
-            margin: 20px;
-        }
-        .form-container input, .form-container select, .form-container button {
-            margin-bottom: 10px;
-            padding: 8px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
         .nav-buttons {
             display: flex;
@@ -62,23 +46,11 @@
             height: 20px;
             margin-right: 5px;
         }
-
-        /* Estilo para a mensagem de confirmação */
-        #mensagemConfirmacao {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: #ccc;
-            color: black;
-            padding: 10px;
-            border-radius: 5px;
-            display: none; /* Escondido até ser acionado */
-        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Cadastro de Produto</h1>
+        <h1>Catálogo de Produtos</h1>
     </header>
 
     <main>
@@ -93,122 +65,61 @@
             </button>
         </div>
 
-        <div class="form-container">
-            <form id="formCadastroProduto">
-                <label for="produto">Produto:</label>
-                <input type="text" id="produto" name="produto" required>
-
-                <label for="codigo">Código:</label>
-                <input type="text" id="codigo" name="codigo" value="" disabled>
-
-                <label for="categoria">Categoria:</label>
-                <select id="categoria" name="categoria">
-                    <option value="hamburguer">Hambúrguer</option>
-                    <option value="acompanhamentos">Acompanhamentos</option>
-                    <option value="bebidas">Bebidas</option>
-                    <option value="molhos">Molhos</option>
-                    <option value="sobremesa">Sobremesa</option>
-                    <option value="composicao">Composição</option>
-                </select>
-
-                <label for="ingredientes">Ingredientes:</label>
-                <select id="ingredientes" multiple>
-                    <!-- Ingredientes do estoque serão carregados aqui -->
-                </select>
-
-                <label for="quantidade">Quantidade:</label>
-                <input type="number" id="quantidade" name="quantidade" required>
-
-                <label for="subTTL">SubTTL (Valor Médio):</label>
-                <input type="number" id="subTTL" name="subTTL" step="0.01" readonly>
-
-                <label for="valorTotal">Valor Total:</label>
-                <input type="number" id="valorTotal" name="valorTotal" step="0.01" readonly>
-
-                <button type="submit">Cadastrar Produto</button>
-            </form>
-        </div>
-
-        <!-- Div para exibir a mensagem de confirmação -->
-        <div id="mensagemConfirmacao"></div>
+        <table id="tabelaProdutos">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Produto</th>
+                    <th>Categoria</th>
+                    <th>Ingredientes</th>
+                    <th>Quantidade</th>
+                    <th>SubTTL (Valor Médio)</th>
+                    <th>Valor Total</th>
+                    <th>Excluir</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Os produtos cadastrados serão inseridos aqui -->
+            </tbody>
+        </table>
     </main>
 
     <script>
-        function gerarCodigoProduto() {
-            return Math.random().toString(36).substring(2, 15);
-        }
+        function carregarProdutos() {
+            const tabela = document.getElementById('tabelaProdutos').getElementsByTagName('tbody')[0];
+            const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 
-        function carregarIngredientes() {
-            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            const ingredientesSelect = document.getElementById('ingredientes');
-            ingredientesSelect.innerHTML = '';
+            tabela.innerHTML = ''; // Limpa a tabela antes de recarregar
 
-            estoque.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.item;
-                option.textContent = `${item.item} - ${item.quantidade} ${item.unidade}`;
-                ingredientesSelect.appendChild(option);
+            produtos.forEach((produto, index) => {
+                const linha = tabela.insertRow();
+
+                linha.insertCell(0).textContent = produto.codigo;
+                linha.insertCell(1).textContent = produto.produto;
+                linha.insertCell(2).textContent = produto.categoria;
+                linha.insertCell(3).textContent = produto.ingredientes.join(', ');
+                linha.insertCell(4).textContent = produto.quantidade;
+                linha.insertCell(5).textContent = `R$ ${produto.subTTL.toFixed(2)}`;
+                linha.insertCell(6).textContent = `R$ ${produto.valorTotal.toFixed(2)}`;
+
+                const celulaAcoes = linha.insertCell(7);
+                const imgExcluir = document.createElement('img');
+                imgExcluir.src = 'Imagens/Lixeira-aberta.png';
+                imgExcluir.alt = 'Excluir';
+                imgExcluir.className = 'delete-icon';
+                imgExcluir.onclick = () => removerProduto(index);
+                celulaAcoes.appendChild(imgExcluir);
             });
         }
 
-        function calcularValor() {
-            const quantidade = parseFloat(document.getElementById('quantidade').value);
-            const ingredientesSelect = document.getElementById('ingredientes');
-            const ingredientes = Array.from(ingredientesSelect.selectedOptions);
-            
-            let subTTL = 0;
-            ingredientes.forEach(ingrediente => {
-                const item = JSON.parse(localStorage.getItem('estoque'))[ingrediente.index];
-                const valorPorUnidade = item.valor / item.quantidade;
-                subTTL += valorPorUnidade * quantidade;
-            });
-
-            const valorTotal = subTTL;
-
-            document.getElementById('subTTL').value = subTTL.toFixed(2);
-            document.getElementById('valorTotal').value = valorTotal.toFixed(2);
-        }
-
-        function cadastrarProduto(event) {
-            event.preventDefault();
-            
-            const produto = document.getElementById('produto').value;
-            const codigo = gerarCodigoProduto();
-            const categoria = document.getElementById('categoria').value;
-            const quantidade = parseFloat(document.getElementById('quantidade').value);
-            const subTTL = parseFloat(document.getElementById('subTTL').value);
-            const valorTotal = parseFloat(document.getElementById('valorTotal').value);
-            const ingredientes = Array.from(document.getElementById('ingredientes').selectedOptions).map(option => option.value);
-
-            const produtoNovo = {
-                produto,
-                codigo,
-                categoria,
-                ingredientes,
-                quantidade,
-                subTTL,
-                valorTotal,
-            };
-
+        function removerProduto(index) {
             let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
-            produtos.push(produtoNovo);
+            produtos.splice(index, 1);
             localStorage.setItem('produtos', JSON.stringify(produtos));
-
-            // Exibir a mensagem de confirmação no canto inferior
-            const mensagemConfirmacao = document.getElementById('mensagemConfirmacao');
-            mensagemConfirmacao.textContent = 'Produto cadastrado com sucesso!';
-            mensagemConfirmacao.style.display = 'block';
-
-            // Esconder a mensagem após 3 segundos
-            setTimeout(() => {
-                mensagemConfirmacao.style.display = 'none';
-            }, 3000);
+            carregarProdutos();
         }
 
-        window.onload = () => {
-            carregarIngredientes();
-            document.getElementById('formCadastroProduto').addEventListener('submit', cadastrarProduto);
-        }
+        window.onload = carregarProdutos;
     </script>
 </body>
 </html>

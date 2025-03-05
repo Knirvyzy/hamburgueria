@@ -75,12 +75,13 @@
             z-index: 1000; /* Garante que fique sobre outros elementos */
             text-align: center;
             display: none; /* Inicialmente escondido */
-            position: fixed; /* Fixa o alerta na tela */
-            top: 50%; /* Centraliza verticalmente */
+            position: absolute; /* Fixa o alerta abaixo do formulário */
+            top: 80%; /* Posiciona abaixo do formulário */
             left: 50%; /* Centraliza horizontalmente */
-            transform: translate(-50%, -50%); /* Ajusta a posição para que o alerta seja completamente centralizado */
+            transform: translateX(-50%); /* Ajusta a posição para que o alerta seja completamente centralizado */
             align-items: center;
             justify-content: space-between;
+            word-wrap: break-word; /* Quebra a palavra longa para evitar que o texto ultrapasse os limites */
         }
 
         /* Estilo para a imagem do polegar */

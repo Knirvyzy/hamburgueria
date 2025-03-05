@@ -78,6 +78,16 @@
             z-index: 1000; /* Garante que fique sobre outros elementos */
             text-align: center;
             display: none; /* Inicialmente escondido */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Estilo para a imagem do polegar */
+        #mensagemConfirmacao img {
+            width: 30px; /* Ajuste o tamanho conforme necessário */
+            height: 30px;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -135,7 +145,10 @@
         </div>
 
         <!-- Div para exibir a mensagem de confirmação -->
-        <div id="mensagemConfirmacao"></div>
+        <div id="mensagemConfirmacao">
+            <span id="mensagemTexto"></span>
+            <img src="Imagens/Polegar.png" alt="Polegar">
+        </div>
     </main>
 
     <script>
@@ -201,7 +214,8 @@
 
             // Exibir a mensagem de confirmação com os detalhes
             const mensagemConfirmacao = document.getElementById('mensagemConfirmacao');
-            mensagemConfirmacao.innerHTML = `
+            const mensagemTexto = document.getElementById('mensagemTexto');
+            mensagemTexto.innerHTML = `
                 <strong>Produto cadastrado com sucesso!</strong><br>
                 <strong>Produto:</strong> ${produto}<br>
                 <strong>Código:</strong> ${codigo}<br>
@@ -210,9 +224,7 @@
                 <strong>Quantidade:</strong> ${quantidade}<br>
                 <strong>Valor Total:</strong> R$ ${valorTotal.toFixed(2)}
             `;
-            mensagemConfirmacao.style.display = 'block'; // Fica visível após o cadastro
-
-            // A caixa permanece visível até o próximo cadastro
+            mensagemConfirmacao.style.display = 'flex'; // Fica visível após o cadastro
         }
 
         window.onload = () => {

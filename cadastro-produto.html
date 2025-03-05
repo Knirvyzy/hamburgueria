@@ -41,8 +41,6 @@
             border-radius: 5px;
             cursor: pointer;
         }
-
-        /* Estilos para os botões de navegação */
         .nav-buttons {
             display: flex;
             justify-content: flex-start;
@@ -72,7 +70,6 @@
     </header>
 
     <main>
-        <!-- Botões de Navegação -->
         <div class="nav-buttons">
             <button onclick="window.history.back()">
                 <img src="Imagens/Retornar.png" alt="Retornar">
@@ -122,12 +119,10 @@
     </main>
 
     <script>
-        // Função para gerar um código único para o produto
         function gerarCodigoProduto() {
             return Math.random().toString(36).substring(2, 15);
         }
 
-        // Função para carregar os ingredientes do estoque
         function carregarIngredientes() {
             const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             const ingredientesSelect = document.getElementById('ingredientes');
@@ -141,7 +136,6 @@
             });
         }
 
-        // Função para calcular o SubTTL e o Valor Total
         function calcularValor() {
             const quantidade = parseFloat(document.getElementById('quantidade').value);
             const ingredientesSelect = document.getElementById('ingredientes');
@@ -160,7 +154,6 @@
             document.getElementById('valorTotal').value = valorTotal.toFixed(2);
         }
 
-        // Função para enviar o formulário e salvar o produto no localStorage
         function cadastrarProduto(event) {
             event.preventDefault();
             
@@ -182,19 +175,17 @@
                 valorTotal,
             };
 
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            estoque.push(produtoNovo);
-            localStorage.setItem('estoque', JSON.stringify(estoque));
+            let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            produtos.push(produtoNovo);
+            localStorage.setItem('produtos', JSON.stringify(produtos));
 
             alert('Produto cadastrado com sucesso!');
-            window.location.href = 'catalogo-estoque.html'; // Redireciona para o catálogo de estoque
+            window.location.href = 'catalogo-produtos.html'; // Agora redireciona corretamente
         }
 
-        // Carregar os ingredientes ao carregar a página
         window.onload = () => {
             carregarIngredientes();
-            const form = document.getElementById('formCadastroProduto');
-            form.addEventListener('submit', cadastrarProduto);
+            document.getElementById('formCadastroProduto').addEventListener('submit', cadastrarProduto);
         }
     </script>
 </body>

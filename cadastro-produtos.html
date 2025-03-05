@@ -6,31 +6,78 @@
     <title>Cadastro de Produto</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+        .form-container {
+            margin: 20px;
+        }
+        .form-container input, .form-container select, .form-container button {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-start;
+            margin: 10px 0;
+        }
+        .nav-buttons button {
+            display: flex;
+            align-items: center;
+            padding: 5px 15px;
+            margin-right: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav-buttons button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+
         /* Estilo para a mensagem de confirmação */
         #mensagemConfirmacao {
             position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: white; /* Fundo branco para não criar rodapé verde */
-            color: #28a745; /* Verde da mensagem */
+            bottom: 0;
+            left: 0;
+            background-color: #28a745; /* Verde claro */
+            color: white; /* Letras brancas */
             padding: 15px;
-            border-radius: 5px;
-            width: 50%; /* Ajustado proporcionalmente ao formulário */
-            max-width: 500px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            display: none; /* Oculta até o cadastro */
-            text-align: left;
-            border: 1px solid #28a745;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        #mensagemConfirmacao img {
-            width: 30px;
-            height: 30px;
-            margin-left: 10px;
+            border-radius: 10px; /* Bordas arredondadas em todas as extremidades */
+            width: 100%;
+            max-width: 90%; /* Para que não ocupe toda a largura da tela */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Efeito sombreado */
+            z-index: 1000; /* Garante que fique sobre outros elementos */
+            text-align: center;
+            display: none; /* Inicialmente escondido */
         }
     </style>
 </head>
@@ -40,6 +87,17 @@
     </header>
 
     <main>
+        <div class="nav-buttons">
+            <button onclick="window.history.back()">
+                <img src="Imagens/Retornar.png" alt="Retornar">
+                Retornar
+            </button>
+            <button onclick="window.location.href='index.html'">
+                <img src="Imagens/Home.png" alt="Tela Inicial">
+                Tela Inicial
+            </button>
+        </div>
+
         <div class="form-container">
             <form id="formCadastroProduto">
                 <label for="produto">Produto:</label>
@@ -59,7 +117,9 @@
                 </select>
 
                 <label for="ingredientes">Ingredientes:</label>
-                <select id="ingredientes" multiple></select>
+                <select id="ingredientes" multiple>
+                    <!-- Ingredientes do estoque serão carregados aqui -->
+                </select>
 
                 <label for="quantidade">Quantidade:</label>
                 <input type="number" id="quantidade" name="quantidade" required>
@@ -75,10 +135,7 @@
         </div>
 
         <!-- Div para exibir a mensagem de confirmação -->
-        <div id="mensagemConfirmacao">
-            <div id="mensagemTexto"></div>
-            <img src="Imagens/Polegar.png" alt="Sucesso">
-        </div>
+        <div id="mensagemConfirmacao"></div>
     </main>
 
     <script>
@@ -99,6 +156,24 @@
             });
         }
 
+        function calcularValor() {
+            const quantidade = parseFloat(document.getElementById('quantidade').value);
+            const ingredientesSelect = document.getElementById('ingredientes');
+            const ingredientes = Array.from(ingredientesSelect.selectedOptions);
+            
+            let subTTL = 0;
+            ingredientes.forEach(ingrediente => {
+                const item = JSON.parse(localStorage.getItem('estoque'))[ingrediente.index];
+                const valorPorUnidade = item.valor / item.quantidade;
+                subTTL += valorPorUnidade * quantidade;
+            });
+
+            const valorTotal = subTTL;
+
+            document.getElementById('subTTL').value = subTTL.toFixed(2);
+            document.getElementById('valorTotal').value = valorTotal.toFixed(2);
+        }
+
         function cadastrarProduto(event) {
             event.preventDefault();
             
@@ -106,6 +181,7 @@
             const codigo = gerarCodigoProduto();
             const categoria = document.getElementById('categoria').value;
             const quantidade = parseFloat(document.getElementById('quantidade').value);
+            const subTTL = parseFloat(document.getElementById('subTTL').value);
             const valorTotal = parseFloat(document.getElementById('valorTotal').value);
             const ingredientes = Array.from(document.getElementById('ingredientes').selectedOptions).map(option => option.value);
 
@@ -115,6 +191,7 @@
                 categoria,
                 ingredientes,
                 quantidade,
+                subTTL,
                 valorTotal,
             };
 
@@ -122,9 +199,10 @@
             produtos.push(produtoNovo);
             localStorage.setItem('produtos', JSON.stringify(produtos));
 
-            // Exibir a mensagem de confirmação
-            const mensagemTexto = `
-                <strong>Produto cadastrado com sucesso!</strong><br><br>
+            // Exibir a mensagem de confirmação com os detalhes
+            const mensagemConfirmacao = document.getElementById('mensagemConfirmacao');
+            mensagemConfirmacao.innerHTML = `
+                <strong>Produto cadastrado com sucesso!</strong><br>
                 <strong>Produto:</strong> ${produto}<br>
                 <strong>Código:</strong> ${codigo}<br>
                 <strong>Categoria:</strong> ${categoria}<br>
@@ -132,8 +210,9 @@
                 <strong>Quantidade:</strong> ${quantidade}<br>
                 <strong>Valor Total:</strong> R$ ${valorTotal.toFixed(2)}
             `;
-            document.getElementById('mensagemTexto').innerHTML = mensagemTexto;
-            document.getElementById('mensagemConfirmacao').style.display = 'flex';
+            mensagemConfirmacao.style.display = 'block'; // Fica visível após o cadastro
+
+            // A caixa permanece visível até o próximo cadastro
         }
 
         window.onload = () => {

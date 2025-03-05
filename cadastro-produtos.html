@@ -74,11 +74,13 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Efeito sombreado */
             z-index: 1000; /* Garante que fique sobre outros elementos */
             text-align: center;
-            margin-top: 20px; /* Espaçamento para não sobrepor o formulário */
             display: none; /* Inicialmente escondido */
+            position: fixed; /* Fixa o alerta na tela */
+            top: 50%; /* Centraliza verticalmente */
+            left: 50%; /* Centraliza horizontalmente */
+            transform: translate(-50%, -50%); /* Ajusta a posição para que o alerta seja completamente centralizado */
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px; /* Adiciona um espaço na parte inferior */
         }
 
         /* Estilo para a imagem do polegar */
@@ -214,7 +216,7 @@
             const mensagemConfirmacao = document.getElementById('mensagemConfirmacao');
             const mensagemTexto = document.getElementById('mensagemTexto');
             mensagemTexto.innerHTML = `
-                <strong>Produto cadastrado com sucesso!</strong><br>
+                <strong>Produto cadastrado com sucesso!</strong><br><br>
                 <strong>Produto:</strong> ${produto}<br>
                 <strong>Código:</strong> ${codigo}<br>
                 <strong>Categoria:</strong> ${categoria}<br>
@@ -223,6 +225,9 @@
                 <strong>Valor Total:</strong> R$ ${valorTotal.toFixed(2)}
             `;
             mensagemConfirmacao.style.display = 'flex'; // Fica visível após o cadastro
+
+            // Limpar os campos do formulário
+            document.getElementById('formCadastroProduto').reset();  // Limpa todos os campos do formulário
         }
 
         window.onload = () => {

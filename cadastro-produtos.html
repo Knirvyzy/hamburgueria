@@ -65,10 +65,6 @@
 
         /* Estilo para a mensagem de confirmação */
         #mensagemConfirmacao {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%); /* Centraliza a caixa */
             background-color: #28a745; /* Verde claro */
             color: white; /* Letras brancas */
             padding: 15px;
@@ -78,9 +74,11 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Efeito sombreado */
             z-index: 1000; /* Garante que fique sobre outros elementos */
             text-align: center;
+            margin-top: 20px; /* Espaçamento para não sobrepor o formulário */
             display: none; /* Inicialmente escondido */
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 20px; /* Adiciona um espaço na parte inferior */
         }
 
         /* Estilo para a imagem do polegar */

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Produto</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+        .form-container {
+            margin: 20px;
+        }
+        .form-container input, .form-container select, .form-container button {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-start;
+            margin: 10px 0;
+        }
+        .nav-buttons button {
+            display: flex;
+            align-items: center;
+            padding: 5px 15px;
+            margin-right: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav-buttons button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+
+        /* Estilo para a mensagem de confirmação */
+        #mensagemConfirmacao {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #ccc;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+            display: none; /* Escondido até ser acionado */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cadastro de Produto</h1>
+    </header>
+
+    <main>
+        <div class="nav-buttons">
+            <button onclick="window.history.back()">
+                <img src="Imagens/Retornar.png" alt="Retornar">
+                Retornar
+            </button>
+            <button onclick="window.location.href='index.html'">
+                <img src="Imagens/Home.png" alt="Tela Inicial">
+                Tela Inicial
+            </button>
+        </div>
+
+        <div class="form-container">
+            <form id="formCadastroProduto">
+                <label for="produto">Produto:</label>
+                <input type="text" id="produto" name="produto" required>
+
+                <label for="codigo">Código:</label>
+                <input type="text" id="codigo" name="codigo" value="" disabled>
+
+                <label for="categoria">Categoria:</label>
+                <select id="categoria" name="categoria">
+                    <option value="hamburguer">Hambúrguer</option>
+                    <option value="acompanhamentos">Acompanhamentos</option>
+                    <option value="bebidas">Bebidas</option>
+                    <option value="molhos">Molhos</option>
+                    <option value="sobremesa">Sobremesa</option>
+                    <option value="composicao">Composição</option>
+                </select>
+
+                <label for="ingredientes">Ingredientes:</label>
+                <select id="ingredientes" multiple>
+                    <!-- Ingredientes do estoque serão carregados aqui -->
+                </select>
+
+                <label for="quantidade">Quantidade:</label>
+                <input type="number" id="quantidade" name="quantidade" required>
+
+                <label for="subTTL">SubTTL (Valor Médio):</label>
+                <input type="number" id="subTTL" name="subTTL" step="0.01" readonly>
+
+                <label for="valorTotal">Valor Total:</label>
+                <input type="number" id="valorTotal" name="valorTotal" step="0.01" readonly>
+
+                <button type="submit">Cadastrar Produto</button>
+            </form>
+        </div>
+
+        <!-- Div para exibir a mensagem de confirmação -->
+        <div id="mensagemConfirmacao"></div>
+    </main>
+
+    <script>
+        function gerarCodigoProduto() {
+            return Math.random().toString(36).substring(2, 15);
+        }
+
+        function carregarIngredientes() {
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            const ingredientesSelect = document.getElementById('ingredientes');
+            ingredientesSelect.innerHTML = '';
+
+            estoque.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.item;
+                option.textContent = `${item.item} - ${item.quantidade} ${item.unidade}`;
+                ingredientesSelect.appendChild(option);
+            });
+        }
+
+        function calcularValor() {
+            const quantidade = parseFloat(document.getElementById('quantidade').value);
+            const ingredientesSelect = document.getElementById('ingredientes');
+            const ingredientes = Array.from(ingredientesSelect.selectedOptions);
+            
+            let subTTL = 0;
+            ingredientes.forEach(ingrediente => {
+                const item = JSON.parse(localStorage.getItem('estoque'))[ingrediente.index];
+                const valorPorUnidade = item.valor / item.quantidade;
+                subTTL += valorPorUnidade * quantidade;
+            });
+
+            const valorTotal = subTTL;
+
+            document.getElementById('subTTL').value = subTTL.toFixed(2);
+            document.getElementById('valorTotal').value = valorTotal.toFixed(2);
+        }
+
+        function cadastrarProduto(event) {
+            event.preventDefault();
+            
+            const produto = document.getElementById('produto').value;
+            const codigo = gerarCodigoProduto();
+            const categoria = document.getElementById('categoria').value;
+            const quantidade = parseFloat(document.getElementById('quantidade').value);
+            const subTTL = parseFloat(document.getElementById('subTTL').value);
+            const valorTotal = parseFloat(document.getElementById('valorTotal').value);
+            const ingredientes = Array.from(document.getElementById('ingredientes').selectedOptions).map(option => option.value);
+
+            const produtoNovo = {
+                produto,
+                codigo,
+                categoria,
+                ingredientes,
+                quantidade,
+                subTTL,
+                valorTotal,
+            };
+
+            let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            produtos.push(produtoNovo);
+            localStorage.setItem('produtos', JSON.stringify(produtos));
+
+            // Exibir a mensagem de confirmação no canto inferior
+            const mensagemConfirmacao = document.getElementById('mensagemConfirmacao');
+            mensagemConfirmacao.textContent = 'Produto cadastrado com sucesso!';
+            mensagemConfirmacao.style.display = 'block';
+
+            // Esconder a mensagem após 3 segundos
+            setTimeout(() => {
+                mensagemConfirmacao.style.display = 'none';
+            }, 3000);
+        }
+
+        window.onload = () => {
+            carregarIngredientes();
+            document.getElementById('formCadastroProduto').addEventListener('submit', cadastrarProduto);
+        }
+    </script>
+</body>
+</html>
+

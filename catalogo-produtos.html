@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Produtos</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-start;
+            margin: 10px 0;
+        }
+        .nav-buttons button {
+            display: flex;
+            align-items: center;
+            padding: 5px 15px;
+            margin-right: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav-buttons button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Catálogo de Produtos</h1>
+    </header>
+
+    <main>
+        <div class="nav-buttons">
+            <button onclick="window.history.back()">
+                <img src="Imagens/Retornar.png" alt="Retornar">
+                Retornar
+            </button>
+            <button onclick="window.location.href='index.html'">
+                <img src="Imagens/Home.png" alt="Tela Inicial">
+                Tela Inicial
+            </button>
+        </div>
+
+        <table id="tabelaProdutos">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Produto</th>
+                    <th>Categoria</th>
+                    <th>Ingredientes</th>
+                    <th>Quantidade</th>
+                    <th>SubTTL (Valor Médio)</th>
+                    <th>Valor Total</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Os produtos cadastrados serão inseridos aqui -->
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        function carregarProdutos() {
+            const tabela = document.getElementById('tabelaProdutos').getElementsByTagName('tbody')[0];
+            const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+
+            tabela.innerHTML = ''; // Limpa a tabela antes de recarregar
+
+            produtos.forEach((produto, index) => {
+                const linha = tabela.insertRow();
+
+                linha.insertCell(0).textContent = produto.codigo;
+                linha.insertCell(1).textContent = produto.produto;
+                linha.insertCell(2).textContent = produto.categoria;
+                linha.insertCell(3).textContent = produto.ingredientes.join(', ');
+                linha.insertCell(4).textContent = produto.quantidade;
+                linha.insertCell(5).textContent = `R$ ${produto.subTTL.toFixed(2)}`;
+                linha.insertCell(6).textContent = `R$ ${produto.valorTotal.toFixed(2)}`;
+
+                const celulaAcoes = linha.insertCell(7);
+                const imgExcluir = document.createElement('img');
+                imgExcluir.src = 'Imagens/Excluir.png';
+                imgExcluir.alt = 'Excluir';
+                imgExcluir.className = 'delete-icon';
+                imgExcluir.onclick = () => removerProduto(index);
+                celulaAcoes.appendChild(imgExcluir);
+            });
+        }
+
+        function removerProduto(index) {
+            let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            produtos.splice(index, 1);
+            localStorage.setItem('produtos', JSON.stringify(produtos));
+            carregarProdutos();
+        }
+
+        window.onload = carregarProdutos;
+    </script>
+</body>
+</html>
+

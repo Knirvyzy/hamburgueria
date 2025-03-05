@@ -62,6 +62,18 @@
             height: 20px;
             margin-right: 5px;
         }
+
+        /* Estilo para a mensagem de confirmação */
+        #mensagemConfirmacao {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #ccc;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+            display: none; /* Escondido até ser acionado */
+        }
     </style>
 </head>
 <body>
@@ -116,6 +128,9 @@
                 <button type="submit">Cadastrar Produto</button>
             </form>
         </div>
+
+        <!-- Div para exibir a mensagem de confirmação -->
+        <div id="mensagemConfirmacao"></div>
     </main>
 
     <script>
@@ -179,8 +194,15 @@
             produtos.push(produtoNovo);
             localStorage.setItem('produtos', JSON.stringify(produtos));
 
-            alert('Produto cadastrado com sucesso!');
-            window.location.href = 'catalogo-produtos.html'; // Agora redireciona corretamente
+            // Exibir a mensagem de confirmação no canto inferior
+            const mensagemConfirmacao = document.getElementById('mensagemConfirmacao');
+            mensagemConfirmacao.textContent = 'Produto cadastrado com sucesso!';
+            mensagemConfirmacao.style.display = 'block';
+
+            // Esconder a mensagem após 3 segundos
+            setTimeout(() => {
+                mensagemConfirmacao.style.display = 'none';
+            }, 3000);
         }
 
         window.onload = () => {

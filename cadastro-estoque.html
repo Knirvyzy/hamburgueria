@@ -6,6 +6,41 @@
     <title>Cadastro de Estoque</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+        .form-container {
+            margin: 20px;
+        }
+        .form-container input, .form-container select, .form-container button {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
         .nav-buttons {
             display: flex;
             justify-content: flex-start;
@@ -27,6 +62,21 @@
             height: 20px;
             margin-right: 5px;
         }
+
+        /* Estilo para a mensagem de confirmação */
+        #mensagemConfirmacao {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #ccc;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+            display: block; /* Agora fica sempre visível */
+            z-index: 9999;
+            width: auto;
+            max-width: 80%; /* Ajuste o tamanho conforme necessário */
+        }
     </style>
 </head>
 <body>
@@ -35,7 +85,6 @@
     </header>
 
     <main>
-        <!-- Botões de Navegação -->
         <div class="nav-buttons">
             <button onclick="window.history.back()">
                 <img src="Imagens/Retornar.png" alt="Retornar">
@@ -47,115 +96,17 @@
             </button>
         </div>
 
-        <form id="cadastroEstoque">
-            <label for="item">Item:</label>
-            <input type="text" id="item" name="item" required>
+        <div class="form-container">
+            <form id="formCadastroEstoque">
+                <label for="item">Item:</label>
+                <input type="text" id="item" name="item" required>
 
-            <label for="descricao">Descrição:</label>
-            <input type="text" id="descricao" name="descricao" required>
+                <label for="quantidade">Quantidade:</label>
+                <input type="number" id="quantidade" name="quantidade" required>
 
-            <label for="categoria">Categoria:</label>
-            <select id="categoria" name="categoria">
-                <option value="descartaveis">Descartáveis</option>
-                <option value="consumivel">Consumíveis</option>
-                <option value="equipamento">Equipamentos</option>
-                <option value="ferramentas">Ferramentas</option>
-            </select>
-
-            <label for="quantidade">Quantidade:</label>
-            <input type="number" id="quantidade" name="quantidade" min="1" required>
-
-            <label for="unidade">Unidade:</label>
-            <select id="unidade" name="unidade">
-                <option value="kg">KG</option>
-                <option value="g">G</option>
-                <option value="l">L</option>
-                <option value="ml">ML</option>
-                <option value="un">UN</option>
-                <option value="pct">PCT</option>
-                <option value="rol">ROL</option>
-                <option value="kit">KIT</option>
-            </select>
-
-            <label for="valor">Valor:</label>
-            <input type="text" id="valor" name="valor" required>
-
-            <button type="submit">Cadastrar</button>
-        </form>
-
-        <div id="respostaCadastro"></div>
-    </main>
-
-    <script>
-        // Função para gerar um novo ID reutilizável
-        function getNovoID() {
-            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            const ids = estoque.map(item => item.id);
-            
-            // Procurar pelo menor ID disponível
-            let novoID = 1;
-            while (ids.includes(novoID)) {
-                novoID++;
-            }
-            return novoID;
-        }
-
-        document.getElementById('cadastroEstoque').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const item = document.getElementById('item').value;
-            const descricao = document.getElementById('descricao').value;
-            const categoria = document.getElementById('categoria').value;
-            const quantidade = document.getElementById('quantidade').value;
-            const unidade = document.getElementById('unidade').value;
-            let valor = document.getElementById('valor').value;
-
-            // Formatar o valor como moeda
-            valor = parseFloat(valor.replace(',', '.')).toFixed(2);
-            valor = valor.replace('.', ',');
-            valor = `R$ ${valor}`;
-
-            const dataCadastro = new Date();
-            const lote = dataCadastro.toLocaleDateString('pt-BR').replace(/\//g, '');
-
-            const itemCadastro = {
-                id: getNovoID(),  // Gerar um novo ID reutilizável
-                item,
-                descricao,
-                categoria,
-                quantidade,
-                unidade,
-                valor,
-                lote,
-            };
-
-            // Recuperar os itens cadastrados no localStorage
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-
-            // Adicionar o novo item ao array
-            estoque.push(itemCadastro);
-
-            // Salvar novamente no localStorage
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-
-            // Exibir mensagem de sucesso
-            const respostaCadastro = document.getElementById('respostaCadastro');
-            respostaCadastro.innerHTML = `
-                <p>Item Cadastrado com Sucesso:</p>
-                <ul>
-                    <li>Item: ${item}</li>
-                    <li>Descrição: ${descricao}</li>
-                    <li>Categoria: ${categoria}</li>
-                    <li>Quantidade: ${quantidade} ${unidade}</li>
-                    <li>Valor: ${valor}</li>
-                    <li>Lote: ${lote}</li>
-                </ul>
-            `;
-
-            // Limpar o formulário após cadastro
-            document.getElementById('cadastroEstoque').reset();
-        });
-    </script>
-</body>
-</html>
+                <label for="unidade">Unidade:</label>
+                <select id="unidade" name="unidade" required>
+                    <option value="kg">Kg</option>
+                    <option value="g">g</option>
+                    <option value="li
 

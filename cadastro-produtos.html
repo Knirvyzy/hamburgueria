@@ -72,7 +72,10 @@
             color: black;
             padding: 10px;
             border-radius: 5px;
-            display: none; /* Escondido até ser acionado */
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: block; /* Agora fica visível sem ser ocultada */
+            z-index: 1000; /* Garante que fique sobre outros elementos */
         }
     </style>
 </head>
@@ -194,15 +197,20 @@
             produtos.push(produtoNovo);
             localStorage.setItem('produtos', JSON.stringify(produtos));
 
-            // Exibir a mensagem de confirmação no canto inferior
+            // Exibir a mensagem de confirmação com os detalhes
             const mensagemConfirmacao = document.getElementById('mensagemConfirmacao');
-            mensagemConfirmacao.textContent = 'Produto cadastrado com sucesso!';
-            mensagemConfirmacao.style.display = 'block';
+            mensagemConfirmacao.innerHTML = `
+                <strong>Produto cadastrado com sucesso!</strong><br>
+                <strong>Produto:</strong> ${produto}<br>
+                <strong>Código:</strong> ${codigo}<br>
+                <strong>Categoria:</strong> ${categoria}<br>
+                <strong>Ingredientes:</strong> ${ingredientes.join(', ')}<br>
+                <strong>Quantidade:</strong> ${quantidade}<br>
+                <strong>Valor Total:</strong> R$ ${valorTotal.toFixed(2)}
+            `;
+            mensagemConfirmacao.style.display = 'block'; // Fica visível até o usuário interagir
 
-            // Esconder a mensagem após 3 segundos
-            setTimeout(() => {
-                mensagemConfirmacao.style.display = 'none';
-            }, 3000);
+            // Aqui não há tempo limite para ocultar a mensagem, ela ficará visível
         }
 
         window.onload = () => {

@@ -30,14 +30,31 @@
 
         /* Alerta verde com sombras e bordas arredondadas */
         .alerta-verde {
-            background-color: #28a745;
+            background-color: #006400; /* Alterado para verde escuro */
             color: white;
-            padding: 15px;
+            padding: 20px; /* Ajustado para mais padding */
             margin: 20px 0;
-            border-radius: 10px;
-            font-size: 16px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px; /* Bordas arredondadas */
+            font-size: 14px; /* Tamanho da fonte ajustado */
+            box-shadow: 5px 5px 30px rgba(0, 100, 0, 0.8); /* Sombra mais suave */
             display: none; /* Inicialmente escondido */
+            width: 100%; /* Largura 100% */
+            max-width: 60%; /* Máximo 60% da largura da tela */
+            z-index: 1000; /* Garante que fique sobre outros elementos */
+            text-align: left; /* Alinhamento à esquerda */
+            position: absolute; /* Posicionado abaixo do formulário */
+            top: calc(100% + 20px); /* 100% da altura do formulário + 20px de margem */
+            left: 50%; /* Centralizado horizontalmente */
+            transform: translateX(-50%); /* Ajuste para centralizar */
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Estilo para a imagem do polegar */
+        .alerta-verde img {
+            width: 30px; /* Ajuste do tamanho do ícone */
+            height: 30px;
+            margin-left: 10px;
         }
 
         .alerta-verde ul {
@@ -142,7 +159,9 @@
         </form>
 
         <!-- Alerta Verde -->
-        <div id="respostaCadastro" class="alerta-verde"></div>
+        <div id="respostaCadastro" class="alerta-verde">
+            <img src="Imagens/polegar.png" alt="Polegar">
+        </div>
     </main>
 
     <script>

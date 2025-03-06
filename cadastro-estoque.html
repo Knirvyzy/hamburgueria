@@ -6,6 +6,41 @@
     <title>Cadastro de Estoque</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+        .form-container {
+            margin: 20px;
+        }
+        .form-container input, .form-container select, .form-container button {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
         .nav-buttons {
             display: flex;
             justify-content: flex-start;
@@ -28,14 +63,39 @@
             margin-right: 5px;
         }
 
-        /* Estilo do alerta de sucesso */
-        #respostaCadastro {
-            display: none; /* Inicialmente invisível */
-            background-color: #28a745;
-            color: white;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 5px;
+        /* Estilo para a mensagem de confirmação */
+        #mensagemConfirmacao {
+            background-color: #006400; /* Verde escuro */
+            color: white; /* Letras brancas */
+            padding: 20px;
+            border-radius: 10px; /* Bordas arredondadas em todas as extremidades */
+            width: 100%;
+            max-width: 60%; /* Agora ocupa no máximo 60% da largura da tela */
+            box-shadow: 5px 5px 30px rgba(0, 100, 0, 0.8); /* Sombra ligeiramente deslocada para o efeito 3D */
+            z-index: 1000; /* Garante que fique sobre outros elementos */
+            text-align: left; /* Alinhamento à esquerda para o texto */
+            display: none; /* Inicialmente escondido */
+            position: absolute; /* Agora é posicionado abaixo do formulário */
+            top: calc(100% + 20px); /* 100% da altura do formulário + 20px de margem */
+            left: 50%; /* Centraliza horizontalmente */
+            transform: translateX(-50%); /* Ajusta para o centro exato */
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        /* Estilo para a imagem do polegar */
+        #mensagemConfirmacao img {
+            width: 30px; /* Ajuste o tamanho conforme necessário */
+            height: 30px;
+            margin-left: 10px;
+        }
+
+        /* Ajustes para o nome do produto longo */
+        #produto {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal; /* Permite que o nome do produto quebre linhas caso seja muito grande */
         }
     </style>
 </head>
@@ -45,7 +105,6 @@
     </header>
 
     <main>
-        <!-- Botões de Navegação -->
         <div class="nav-buttons">
             <button onclick="window.history.back()">
                 <img src="Imagens/Retornar.png" alt="Retornar">
@@ -57,116 +116,82 @@
             </button>
         </div>
 
-        <form id="cadastroEstoque">
-            <label for="item">Item:</label>
-            <input type="text" id="item" name="item" required>
+        <div class="form-container">
+            <form id="formCadastroEstoque">
+                <label for="item">Item:</label>
+                <input type="text" id="item" name="item" required maxlength="32">
 
-            <label for="descricao">Descrição:</label>
-            <input type="text" id="descricao" name="descricao" required>
+                <label for="quantidade">Quantidade:</label>
+                <input type="number" id="quantidade" name="quantidade" required>
 
-            <label for="categoria">Categoria:</label>
-            <select id="categoria" name="categoria">
-                <option value="descartaveis">Descartáveis</option>
-                <option value="consumivel">Consumíveis</option>
-                <option value="equipamento">Equipamentos</option>
-                <option value="ferramentas">Ferramentas</option>
-            </select>
+                <label for="unidade">Unidade:</label>
+                <select id="unidade" name="unidade">
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="litro">litro</option>
+                    <option value="ml">ml</option>
+                    <option value="unidade">unidade</option>
+                </select>
 
-            <label for="quantidade">Quantidade:</label>
-            <input type="number" id="quantidade" name="quantidade" min="1" required>
+                <label for="valor">Valor Unitário:</label>
+                <input type="number" id="valor" name="valor" step="0.01" required>
 
-            <label for="unidade">Unidade:</label>
-            <select id="unidade" name="unidade">
-                <option value="kg">KG</option>
-                <option value="g">G</option>
-                <option value="l">L</option>
-                <option value="ml">ML</option>
-                <option value="un">UN</option>
-                <option value="pct">PCT</option>
-                <option value="rol">ROL</option>
-                <option value="kit">KIT</option>
-            </select>
+                <button type="submit">Cadastrar Item</button>
+            </form>
+        </div>
 
-            <label for="valor">Valor:</label>
-            <input type="text" id="valor" name="valor" required>
-
-            <button type="submit">Cadastrar</button>
-        </form>
-
-        <!-- O alerta de sucesso fica invisível inicialmente -->
-        <div id="respostaCadastro"></div>
+        <!-- Div para exibir a mensagem de confirmação -->
+        <div id="mensagemConfirmacao">
+            <span id="mensagemTexto"></span>
+            <img src="Imagens/Polegar.png" alt="Polegar">
+        </div>
     </main>
 
     <script>
-        // Função para gerar um novo ID reutilizável
-        function getNovoID() {
-            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            const ids = estoque.map(item => item.id);
-            
-            // Procurar pelo menor ID disponível
-            let novoID = 1;
-            while (ids.includes(novoID)) {
-                novoID++;
-            }
-            return novoID;
+        function gerarCodigoEstoque() {
+            return Math.random().toString(36).substring(2, 15);
         }
 
-        document.getElementById('cadastroEstoque').addEventListener('submit', function(event) {
+        function cadastrarItem(event) {
             event.preventDefault();
-
+            
             const item = document.getElementById('item').value;
-            const descricao = document.getElementById('descricao').value;
-            const categoria = document.getElementById('categoria').value;
-            const quantidade = document.getElementById('quantidade').value;
+            const codigo = gerarCodigoEstoque();
+            const quantidade = parseFloat(document.getElementById('quantidade').value);
             const unidade = document.getElementById('unidade').value;
-            let valor = document.getElementById('valor').value;
+            const valor = parseFloat(document.getElementById('valor').value);
 
-            // Formatar o valor como moeda
-            valor = parseFloat(valor.replace(',', '.')).toFixed(2);
-            valor = valor.replace('.', ',');
-            valor = `R$ ${valor}`;
-
-            const dataCadastro = new Date();
-            const lote = dataCadastro.toLocaleDateString('pt-BR').replace(/\//g, '');
-
-            const itemCadastro = {
-                id: getNovoID(),  // Gerar um novo ID reutilizável
+            const itemNovo = {
                 item,
-                descricao,
-                categoria,
+                codigo,
                 quantidade,
                 unidade,
                 valor,
-                lote,
             };
 
-            // Recuperar os itens cadastrados no localStorage
             let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-
-            // Adicionar o novo item ao array
-            estoque.push(itemCadastro);
-
-            // Salvar novamente no localStorage
+            estoque.push(itemNovo);
             localStorage.setItem('estoque', JSON.stringify(estoque));
 
-            // Exibir mensagem de sucesso apenas após o cadastro
-            const respostaCadastro = document.getElementById('respostaCadastro');
-            respostaCadastro.innerHTML = `
-                <p>Item Cadastrado com Sucesso:</p>
-                <ul>
-                    <li>Item: ${item}</li>
-                    <li>Descrição: ${descricao}</li>
-                    <li>Categoria: ${categoria}</li>
-                    <li>Quantidade: ${quantidade} ${unidade}</li>
-                    <li>Valor: ${valor}</li>
-                    <li>Lote: ${lote}</li>
-                </ul>
+            // Exibir a mensagem de confirmação com os detalhes
+            const mensagemConfirmacao = document.getElementById('mensagemConfirmacao');
+            const mensagemTexto = document.getElementById('mensagemTexto');
+            mensagemTexto.innerHTML = `
+                <strong>Item cadastrado com sucesso!</strong><br><br>
+                <strong>Item:</strong> ${item}<br>
+                <strong>Código:</strong> ${codigo}<br>
+                <strong>Quantidade:</strong> ${quantidade} ${unidade}<br>
+                <strong>Valor Unitário:</strong> R$ ${valor.toFixed(2)}
             `;
-            respostaCadastro.style.display = 'block'; // Tornar o alerta visível
+            mensagemConfirmacao.style.display = 'flex'; // Fica visível após o cadastro
 
-            // Limpar o formulário após cadastro
-            document.getElementById('cadastroEstoque').reset();
-        });
+            // Limpar os campos do formulário
+            document.getElementById('formCadastroEstoque').reset();  // Limpa todos os campos do formulário
+        }
+
+        window.onload = () => {
+            document.getElementById('formCadastroEstoque').addEventListener('submit', cadastrarItem);
+        }
     </script>
 </body>
 </html>

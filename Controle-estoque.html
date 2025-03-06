@@ -6,32 +6,33 @@
     <title>Controle de Estoque</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-            white-space: nowrap;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .delete-icon {
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
         }
 
+        /* Ajuste do cabeçalho */
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 15px 20px;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* Container do filtro e botões */
         .filter-container {
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            gap: 10px; /* Espaçamento uniforme entre elementos */
-            margin-bottom: 10px;
+            gap: 10px; /* Espaçamento entre os elementos */
+            margin: 10px;
         }
 
         input[type="text"] {
@@ -39,21 +40,47 @@
             width: 200px;
         }
 
+        /* Ajuste dos botões "Saldo Zero" e "Vencidos" */
+        #filterZero, #filterVencido {
+            width: 140px;  /* Largura fixa para evitar quebra do texto */
+            height: 36px;  /* Mesma altura */
+            text-align: center;
+            font-size: 14px;
+        }
+
         button {
             padding: 5px 10px;
             font-size: 14px;
-            height: 32px; /* Define altura uniforme */
+            height: 36px;
         }
 
-        /* Ajustes para botões menores */
-        #filterZero, #filterVencido, button.small-btn {
-            width: auto; /* Ajusta largura automaticamente ao conteúdo */
-            min-width: 80px; /* Define um limite mínimo de largura */
+        /* Ajustes para botões pequenos */
+        .small-btn {
+            padding: 5px 8px;
+            height: 32px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
             text-align: center;
         }
 
-        .small-btn {
-            padding: 5px 8px;
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
         }
 
         .zero-saldo { color: red; }

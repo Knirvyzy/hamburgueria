@@ -30,7 +30,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            gap: 10px; /* Espaçamento uniforme entre elementos */
+            gap: 10px;
             margin-bottom: 10px;
         }
 
@@ -42,18 +42,21 @@
         button {
             padding: 5px 10px;
             font-size: 14px;
-            height: 32px; /* Define altura uniforme */
+            height: 32px;
+            background-color: #003366; /* Azul escuro */
+            color: white;
+            border: none;
+            cursor: pointer;
         }
 
-        /* Ajustes para botões menores */
-        #filterZero, #filterVencido, button.small-btn {
-            width: auto; /* Ajusta largura automaticamente ao conteúdo */
-            min-width: 80px; /* Define um limite mínimo de largura */
-            text-align: center;
+        /* Ajustes para botões */
+        #filterZero, #filterVencido {
+            width: 120px; /* Aumentando a largura */
         }
 
         .small-btn {
             padding: 5px 8px;
+            width: 80px;
         }
 
         .zero-saldo { color: red; }
@@ -63,6 +66,13 @@
 
         .active-filter {
             border: 2px solid #0056b3;
+        }
+
+        header {
+            background-color: #003366; /* Azul escuro */
+            color: white;
+            padding: 10px;
+            text-align: left;
         }
     </style>
 </head>
@@ -131,10 +141,10 @@
                     <td>${item.valor}</td>
                     <td class="${vencidoClass}" id="lote-${index}">${item.lote}</td>
                     <td>
+                        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
                         <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
                         <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
                         <button class="small-btn" onclick="audit(${index})">Audit</button>
-                        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
                     </td>
                 `;
                 tabelaBody.appendChild(linha);

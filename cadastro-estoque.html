@@ -27,6 +27,37 @@
             height: 20px;
             margin-right: 5px;
         }
+
+        /* Estilo para o alerta */
+        #respostaCadastro {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #4CAF50; /* Cor de sucesso */
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+        }
+
+        #respostaCadastro p {
+            font-weight: bold;
+            margin: 0;
+        }
+
+        #respostaCadastro ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        #respostaCadastro ul li {
+            margin-bottom: 8px;
+        }
+
+        /* Estilo para alertas de erro (caso necessário no futuro) */
+        .alert-error {
+            background-color: #f44336; /* Cor de erro */
+            border: 1px solid #d32f2f;
+        }
     </style>
 </head>
 <body>
@@ -83,6 +114,7 @@
             <button type="submit">Cadastrar</button>
         </form>
 
+        <!-- Div para exibição do alerta -->
         <div id="respostaCadastro"></div>
     </main>
 
@@ -140,8 +172,9 @@
 
             // Exibir mensagem de sucesso
             const respostaCadastro = document.getElementById('respostaCadastro');
+            respostaCadastro.className = ''; // Remove qualquer classe anterior
             respostaCadastro.innerHTML = `
-                <p>Item Cadastrado com Sucesso:</p>
+                <p>Item Cadastrado com Sucesso!</p>
                 <ul>
                     <li>Item: ${item}</li>
                     <li>Descrição: ${descricao}</li>
@@ -151,6 +184,7 @@
                     <li>Lote: ${lote}</li>
                 </ul>
             `;
+            respostaCadastro.classList.add('alert-success');  // Classe para estilizar a resposta
 
             // Limpar o formulário após cadastro
             document.getElementById('cadastroEstoque').reset();
@@ -158,3 +192,4 @@
     </script>
 </body>
 </html>
+

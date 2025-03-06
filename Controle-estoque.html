@@ -7,32 +7,26 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body {
-            margin: 0;
             font-family: Arial, sans-serif;
         }
 
-        /* Ajuste do cabeçalho */
         header {
-            background-color: #0056b3;
+            background-color: #0056b3; /* Azul igual aos botões */
             color: white;
-            padding: 15px 20px;
+            padding: 10px;
             text-align: left;
-            width: 100%;
-            box-sizing: border-box;
         }
 
-        header h1 {
+        h1 {
             margin: 0;
             font-size: 24px;
         }
 
-        /* Container do filtro e botões */
         .filter-container {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            gap: 10px; /* Espaçamento entre os elementos */
-            margin: 10px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         input[type="text"] {
@@ -40,24 +34,34 @@
             width: 200px;
         }
 
-        /* Ajuste dos botões "Saldo Zero" e "Vencidos" */
-        #filterZero, #filterVencido {
-            width: 140px;  /* Largura fixa para evitar quebra do texto */
-            height: 36px;  /* Mesma altura */
-            text-align: center;
-            font-size: 14px;
-        }
-
         button {
             padding: 5px 10px;
-            font-size: 14px;
-            height: 36px;
+            border: none;
+            cursor: pointer;
         }
 
-        /* Ajustes para botões pequenos */
-        .small-btn {
-            padding: 5px 8px;
-            height: 32px;
+        #filterZero, #filterVencido {
+            width: 110px; /* Ajustei a largura para evitar quebra de texto */
+            height: 32px; /* Mantendo altura uniforme */
+            text-align: center;
+        }
+
+        #filterZero, #filterVencido, #audit-btn {
+            background-color: #0056b3;
+            color: white;
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
         }
 
         table {
@@ -70,26 +74,19 @@
             border: 1px solid #ccc;
             padding: 8px;
             text-align: center;
-            white-space: nowrap;
         }
 
         th {
             background-color: #f4f4f4;
         }
 
-        .delete-icon {
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
-        }
-
         .zero-saldo { color: red; }
-        .baixo-saldo { color: #FFBF00; } /* Âmbar */
+        .baixo-saldo { color: #FFBF00; }
         .vencido { border: 2px solid red; }
         .prestes-vencer { border: 2px solid red; }
 
         .active-filter {
-            border: 2px solid #0056b3;
+            border: 2px solid #ffffff;
         }
     </style>
 </head>
@@ -157,11 +154,11 @@
                     <td>${item.unidade}</td>
                     <td>${item.valor}</td>
                     <td class="${vencidoClass}" id="lote-${index}">${item.lote}</td>
-                    <td>
-                        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
-                        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
-                        <button class="small-btn" onclick="audit(${index})">Audit</button>
+                    <td class="actions">
                         <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
+                        <button onclick="alterarQuantidade(${index}, 1)">+</button>
+                        <button onclick="alterarQuantidade(${index}, -1)">-</button>
+                        <button id="audit-btn" onclick="audit(${index})">Audit</button>
                     </td>
                 `;
                 tabelaBody.appendChild(linha);

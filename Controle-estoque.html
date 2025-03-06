@@ -6,26 +6,31 @@
     <title>Controle de Estoque</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
         }
-
-        header {
-            background-color: #0056b3; /* Azul igual aos botões */
-            color: white;
-            padding: 10px;
-            text-align: left;
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
         }
-
-        h1 {
-            margin: 0;
-            font-size: 24px;
+        th {
+            background-color: #f4f4f4;
+        }
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
         }
 
         .filter-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: flex-start;
+            gap: 10px; /* Espaçamento uniforme entre elementos */
             margin-bottom: 10px;
         }
 
@@ -36,57 +41,28 @@
 
         button {
             padding: 5px 10px;
-            border: none;
-            cursor: pointer;
-        }
-
-        #filterZero, #filterVencido {
-            width: 110px; /* Ajustei a largura para evitar quebra de texto */
-            height: 32px; /* Mantendo altura uniforme */
-            text-align: center;
-        }
-
-        #filterZero, #filterVencido, #audit-btn {
-            background-color: #0056b3;
-            color: white;
             font-size: 14px;
+            height: 32px; /* Define altura uniforme */
         }
 
-        .actions {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .delete-icon {
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        /* Ajustes para botões menores */
+        #filterZero, #filterVencido, button.small-btn {
+            width: auto; /* Ajusta largura automaticamente ao conteúdo */
+            min-width: 80px; /* Define um limite mínimo de largura */
             text-align: center;
         }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #f4f4f4;
+        .small-btn {
+            padding: 5px 8px;
         }
 
         .zero-saldo { color: red; }
-        .baixo-saldo { color: #FFBF00; }
+        .baixo-saldo { color: #FFBF00; } /* Âmbar */
         .vencido { border: 2px solid red; }
         .prestes-vencer { border: 2px solid red; }
 
         .active-filter {
-            border: 2px solid #ffffff;
+            border: 2px solid #0056b3;
         }
     </style>
 </head>
@@ -154,11 +130,11 @@
                     <td>${item.unidade}</td>
                     <td>${item.valor}</td>
                     <td class="${vencidoClass}" id="lote-${index}">${item.lote}</td>
-                    <td class="actions">
+                    <td>
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
+                        <button class="small-btn" onclick="audit(${index})">Audit</button>
                         <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
-                        <button onclick="alterarQuantidade(${index}, 1)">+</button>
-                        <button onclick="alterarQuantidade(${index}, -1)">-</button>
-                        <button id="audit-btn" onclick="audit(${index})">Audit</button>
                     </td>
                 `;
                 tabelaBody.appendChild(linha);

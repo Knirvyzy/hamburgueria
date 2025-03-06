@@ -25,22 +25,35 @@
             width: 20px;
             height: 20px;
         }
+
+        /* Estilização dos botões e do container */
         .filter-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 10px;
         }
-        input[type="text"] {
+        
+        .filter-container input {
             padding: 5px;
             width: 200px;
         }
-        button {
-            padding: 5px 10px;
-            margin-left: 10px;
+
+        .button-group {
+            display: flex;
+            gap: 10px;
         }
 
-        .zero-saldo { color: red; }
-        .baixo-saldo { color: #FFBF00; } /* Âmbar */
-        .vencido { border: 2px solid red; }
-        .prestes-vencer { border: 2px solid red; }
+        .button-group button {
+            padding: 5px 10px;
+            width: 120px; /* Reduzi o tamanho dos botões */
+        }
+
+        /* Grupo de botões à direita */
+        .right-buttons {
+            display: flex;
+            gap: 10px;
+        }
 
         .active-filter {
             border: 2px solid #0056b3;
@@ -54,9 +67,21 @@
 
     <main>
         <div class="filter-container">
+            <!-- Filtro de pesquisa -->
             <input type="text" id="filtro" placeholder="Filtrar itens..." onkeyup="filtrarItens()">
-            <button id="filterZero" onclick="toggleFiltroZero()">Saldo Zero</button>
-            <button id="filterVencido" onclick="toggleFiltroVencido()">Vencidos</button>
+
+            <!-- Botões "Saldo Zero" e "Vencidos" lado a lado, alinhados à direita -->
+            <div class="right-buttons">
+                <button id="filterZero" onclick="toggleFiltroZero()">Saldo Zero</button>
+                <button id="filterVencido" onclick="toggleFiltroVencido()">Vencidos</button>
+            </div>
+        </div>
+
+        <!-- Botões "Incrementos", "Decrementos" e "Audit" na mesma linha -->
+        <div class="button-group">
+            <button onclick="alterarQuantidade(0, 1)">Incrementos</button>
+            <button onclick="alterarQuantidade(0, -1)">Decrementos</button>
+            <button onclick="audit(0)">Audit</button>
         </div>
 
         <table id="estoqueTabela">

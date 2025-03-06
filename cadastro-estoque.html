@@ -28,35 +28,14 @@
             margin-right: 5px;
         }
 
-        /* Estilo para o alerta */
+        /* Estilo do alerta de sucesso */
         #respostaCadastro {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #4CAF50; /* Cor de sucesso */
+            display: none; /* Inicialmente invisível */
+            background-color: #28a745;
             color: white;
+            padding: 15px;
+            margin-top: 20px;
             border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            font-family: Arial, sans-serif;
-        }
-
-        #respostaCadastro p {
-            font-weight: bold;
-            margin: 0;
-        }
-
-        #respostaCadastro ul {
-            margin-top: 10px;
-            padding-left: 20px;
-        }
-
-        #respostaCadastro ul li {
-            margin-bottom: 8px;
-        }
-
-        /* Estilo para alertas de erro (caso necessário no futuro) */
-        .alert-error {
-            background-color: #f44336; /* Cor de erro */
-            border: 1px solid #d32f2f;
         }
     </style>
 </head>
@@ -114,7 +93,7 @@
             <button type="submit">Cadastrar</button>
         </form>
 
-        <!-- Div para exibição do alerta -->
+        <!-- O alerta de sucesso fica invisível inicialmente -->
         <div id="respostaCadastro"></div>
     </main>
 
@@ -170,11 +149,10 @@
             // Salvar novamente no localStorage
             localStorage.setItem('estoque', JSON.stringify(estoque));
 
-            // Exibir mensagem de sucesso
+            // Exibir mensagem de sucesso apenas após o cadastro
             const respostaCadastro = document.getElementById('respostaCadastro');
-            respostaCadastro.className = ''; // Remove qualquer classe anterior
             respostaCadastro.innerHTML = `
-                <p>Item Cadastrado com Sucesso!</p>
+                <p>Item Cadastrado com Sucesso:</p>
                 <ul>
                     <li>Item: ${item}</li>
                     <li>Descrição: ${descricao}</li>
@@ -184,7 +162,7 @@
                     <li>Lote: ${lote}</li>
                 </ul>
             `;
-            respostaCadastro.classList.add('alert-success');  // Classe para estilizar a resposta
+            respostaCadastro.style.display = 'block'; // Tornar o alerta visível
 
             // Limpar o formulário após cadastro
             document.getElementById('cadastroEstoque').reset();

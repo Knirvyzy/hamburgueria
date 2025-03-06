@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Estoque</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+        .filter-container {
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            padding: 5px 10px;
+            margin-left: 10px;
+        }
+
+        /* Estilos para os botões de navegação */
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-start;
+            margin: 10px 0;
+        }
+        .nav-buttons button {
+            display: flex;
+            align-items: center;
+            padding: 5px 15px;
+            margin-right: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav-buttons button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Controle de Estoque</h1>
+    </header>
+
+    <main>
+        <!-- Botões de Navegação -->
+        <div class="nav-buttons">
+            <button onclick="window.history.back()">
+                <img src="Imagens/Retornar.png" alt="Retornar">
+                Retornar
+            </button>
+            <button onclick="window.location.href='index.html'">
+                <img src="Imagens/Home.png" alt="Tela Inicial">
+                Tela Inicial
+            </button>
+        </div>
+
+        <div class="filter-container">
+            <input type="text" id="filtro" placeholder="Filtrar itens..." onkeyup="filtrarItens()">
+            <button onclick="excluirSelecionados()">Excluir Selecionados</button>
+        </div>
+
+        <table id="estoqueTabela">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th><input type="checkbox" id="selecionarTodos" onclick="selecionarTodos()"></th>
+                    <th>Item</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Quantidade</th>
+                    <th>Unidade</th>
+                    <th>Valor</th>
+                    <th>Lote</th>
+                    <th>Excluir</th>
+                </tr>
+            </thead>
+            <tbody id="estoqueLista">
+                <!-- Os itens cadastrados serão inseridos aqui -->
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        // Recupera o último ID salvo ou inicia em 1
+        function getNovoID() {
+            let ultimoID = localStorage.getItem('ultimoID') || 0;
+            ultimoID = parseInt(ultimoID) + 1;
+            localStorage.setItem('ultimoID', ultimoID);
+            return ultimoID;
+        }
+
+        // Função para carregar os itens do estoque
+        function carregarEstoque() {
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            const tabelaBody = document.getElementById('estoqueLista');
+            tabelaBody.innerHTML = ''; // Limpa a tabela
+
+            if (estoque.length === 0) {
+                tabelaBody.innerHTML = '<tr><td colspan="10">Nenhum item no estoque.</td></tr>';
+                return;
+            }
+
+            estoque.forEach((item, index) => {
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+                    <td>${item.id}</td>
+                    <td><input type="checkbox" class="selecionar-item" data-index="${index}"></td>
+                    <td>${item.item}</td>
+                    <td>${item.descricao}</td>
+                    <td>${item.categoria}</td>
+                    <td>${item.quantidade}</td>
+                    <td>${item.unidade}</td>
+                    <td>${item.valor}</td>
+                    <td>${item.lote}</td>
+                    <td>
+                        <img src="Imagens/Lixeira-aberta.png" alt="Excluir" class="delete-icon" onclick="excluirItem(${index})">
+                    </td>
+                `;
+                tabelaBody.appendChild(linha);
+            });
+        }
+
+        // Função para excluir um item individualmente
+        function excluirItem(index) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            estoque.splice(index, 1); // Remove o item do array
+            localStorage.setItem('estoque', JSON.stringify(estoque)); // Atualiza o localStorage
+            carregarEstoque(); // Recarrega a tabela
+        }
+
+        // Função para excluir múltiplos itens selecionados
+        function excluirSelecionados() {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            const checkboxes = document.querySelectorAll('.selecionar-item:checked');
+
+            if (checkboxes.length === 0) {
+                alert('Nenhum item selecionado!');
+                return;
+            }
+
+            let indicesParaRemover = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index')));
+
+            estoque = estoque.filter((_, index) => !indicesParaRemover.includes(index));
+
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+
+            carregarEstoque();
+        }
+
+        // Função para selecionar todos os itens
+        function selecionarTodos() {
+            const checkboxes = document.querySelectorAll('.selecionar-item');
+            const selecionarTodosCheckbox = document.getElementById('selecionarTodos');
+            checkboxes.forEach(cb => cb.checked = selecionarTodosCheckbox.checked);
+        }
+
+        // Função para filtrar os itens na tabela
+        function filtrarItens() {
+            const filtro = document.getElementById('filtro').value.toLowerCase();
+            const linhas = document.querySelectorAll('#estoqueLista tr');
+
+            linhas.forEach(linha => {
+                const textoLinha = linha.innerText.toLowerCase();
+                linha.style.display = textoLinha.includes(filtro) ? '' : 'none';
+            });
+        }
+
+        // Carregar estoque ao iniciar a página
+        window.onload = carregarEstoque;
+    </script>
+</body>
+</html>
+

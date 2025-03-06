@@ -27,21 +27,63 @@
             height: 20px;
             margin-right: 5px;
         }
+
+        /* Alerta verde com sombras e bordas arredondadas */
         .alerta-verde {
             background-color: #28a745;
             color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 20px;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
             font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             display: none; /* Inicialmente escondido */
         }
+
         .alerta-verde ul {
             list-style-type: none;
-            padding-left: 0;
+            padding: 0;
         }
-        .alerta-verde ul li {
+
+        .alerta-verde li {
+            margin: 5px 0;
+        }
+
+        /* Estilo para o formulário */
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        form label {
+            font-weight: bold;
             margin-bottom: 5px;
+            display: block;
+        }
+
+        form input, form select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        form button {
+            padding: 10px 15px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        form button:hover {
+            background-color: #003d7a;
         }
     </style>
 </head>
@@ -99,7 +141,7 @@
             <button type="submit">Cadastrar</button>
         </form>
 
-        <!-- Alerta verde para sucesso -->
+        <!-- Alerta Verde -->
         <div id="respostaCadastro" class="alerta-verde"></div>
     </main>
 
@@ -155,20 +197,20 @@
             // Salvar novamente no localStorage
             localStorage.setItem('estoque', JSON.stringify(estoque));
 
-            // Exibir mensagem de sucesso no alerta verde
+            // Exibir mensagem de sucesso
             const respostaCadastro = document.getElementById('respostaCadastro');
             respostaCadastro.innerHTML = `
-                <p>Item Cadastrado com Sucesso:</p>
+                <p><strong>Item Cadastrado com Sucesso:</strong></p>
                 <ul>
-                    <li>Item: ${item}</li>
-                    <li>Descrição: ${descricao}</li>
-                    <li>Categoria: ${categoria}</li>
-                    <li>Quantidade: ${quantidade} ${unidade}</li>
-                    <li>Valor: ${valor}</li>
-                    <li>Lote: ${lote}</li>
+                    <li><strong>Item:</strong> ${item}</li>
+                    <li><strong>Descrição:</strong> ${descricao}</li>
+                    <li><strong>Categoria:</strong> ${categoria}</li>
+                    <li><strong>Quantidade:</strong> ${quantidade} ${unidade}</li>
+                    <li><strong>Valor:</strong> ${valor}</li>
+                    <li><strong>Lote:</strong> ${lote}</li>
                 </ul>
             `;
-            respostaCadastro.style.display = 'block';  // Exibir o alerta verde
+            respostaCadastro.style.display = 'block'; // Exibir o alerta verde
 
             // Limpar o formulário após cadastro
             document.getElementById('cadastroEstoque').reset();

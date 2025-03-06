@@ -26,34 +26,40 @@
             height: 20px;
         }
 
-        /* Estilização dos botões e do container */
         .filter-container {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
+            gap: 10px; /* Espaçamento uniforme entre elementos */
             margin-bottom: 10px;
         }
-        
-        .filter-container input {
+
+        input[type="text"] {
             padding: 5px;
             width: 200px;
         }
 
-        .button-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .button-group button {
+        button {
             padding: 5px 10px;
-            width: 120px; /* Reduzi o tamanho dos botões */
+            font-size: 14px;
+            height: 32px; /* Define altura uniforme */
         }
 
-        /* Grupo de botões à direita */
-        .right-buttons {
-            display: flex;
-            gap: 10px;
+        /* Ajustes para botões menores */
+        #filterZero, #filterVencido, button.small-btn {
+            width: auto; /* Ajusta largura automaticamente ao conteúdo */
+            min-width: 80px; /* Define um limite mínimo de largura */
+            text-align: center;
         }
+
+        .small-btn {
+            padding: 5px 8px;
+        }
+
+        .zero-saldo { color: red; }
+        .baixo-saldo { color: #FFBF00; } /* Âmbar */
+        .vencido { border: 2px solid red; }
+        .prestes-vencer { border: 2px solid red; }
 
         .active-filter {
             border: 2px solid #0056b3;
@@ -67,21 +73,9 @@
 
     <main>
         <div class="filter-container">
-            <!-- Filtro de pesquisa -->
             <input type="text" id="filtro" placeholder="Filtrar itens..." onkeyup="filtrarItens()">
-
-            <!-- Botões "Saldo Zero" e "Vencidos" lado a lado, alinhados à direita -->
-            <div class="right-buttons">
-                <button id="filterZero" onclick="toggleFiltroZero()">Saldo Zero</button>
-                <button id="filterVencido" onclick="toggleFiltroVencido()">Vencidos</button>
-            </div>
-        </div>
-
-        <!-- Botões "Incrementos", "Decrementos" e "Audit" na mesma linha -->
-        <div class="button-group">
-            <button onclick="alterarQuantidade(0, 1)">Incrementos</button>
-            <button onclick="alterarQuantidade(0, -1)">Decrementos</button>
-            <button onclick="audit(0)">Audit</button>
+            <button id="filterZero" onclick="toggleFiltroZero()">Saldo Zero</button>
+            <button id="filterVencido" onclick="toggleFiltroVencido()">Vencidos</button>
         </div>
 
         <table id="estoqueTabela">
@@ -137,9 +131,9 @@
                     <td>${item.valor}</td>
                     <td class="${vencidoClass}" id="lote-${index}">${item.lote}</td>
                     <td>
-                        <button onclick="alterarQuantidade(${index}, 1)">+</button>
-                        <button onclick="alterarQuantidade(${index}, -1)">-</button>
-                        <button onclick="audit(${index})">Audit</button>
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
+                        <button class="small-btn" onclick="audit(${index})">Audit</button>
                         <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
                     </td>
                 `;

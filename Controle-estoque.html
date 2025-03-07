@@ -61,8 +61,8 @@
             width: 80px;
         }
 
-        .zero-saldo { color: red; }
-        .baixo-saldo { color: #FFBF00; } /* Âmbar */
+        .linha-zero-saldo { color: red; }
+        .linha-baixo-saldo { color: #FF6F00; } /* Laranja */
         .vencido { border: 2px solid red; }
         .prestes-vencer { border: 2px solid red; }
 
@@ -125,8 +125,8 @@
 
                 let saldoClass = '';
                 if (item.quantidade == 0 && !filtroZeroAtivo) return;
-                if (item.quantidade == 0) saldoClass = 'zero-saldo';
-                else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
+                if (item.quantidade == 0) saldoClass = 'linha-zero-saldo';
+                else if (item.quantidade < 5) saldoClass = 'linha-baixo-saldo';
 
                 let vencidoClass = '';
                 if (dataVencimento < dataAtual && !filtroVencidoAtivo) return;
@@ -134,15 +134,17 @@
                 else if (diferencaDias <= 4) vencidoClass = 'prestes-vencer';
 
                 const linha = document.createElement('tr');
+                linha.classList.add(saldoClass, vencidoClass); // Adicionando as classes de cor para toda a linha
+
                 linha.innerHTML = `
                     <td>${item.id}</td>
                     <td>${item.item}</td>
                     <td>${item.descricao}</td>
                     <td>${item.categoria}</td>
-                    <td class="${saldoClass}" id="quantidade-${index}">${item.quantidade}</td>
+                    <td id="quantidade-${index}">${item.quantidade}</td>
                     <td>${item.unidade}</td>
                     <td>${item.valor}</td>
-                    <td class="${vencidoClass}" id="lote-${index}">${item.lote}</td>
+                    <td id="lote-${index}">${item.lote}</td>
                     <td>
                         <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
                         <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>

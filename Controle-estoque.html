@@ -114,61 +114,46 @@
         let filtroVencidoAtivo = false;
 
         function carregarEstoque() {
-    const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-    const tabelaBody = document.getElementById('estoqueLista');
-    tabelaBody.innerHTML = '';
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            const tabelaBody = document.getElementById('estoqueLista');
+            tabelaBody.innerHTML = '';
 
-    estoque.forEach((item, index) => {
-        const dataAtual = new Date();
-        const dataVencimento = new Date(item.vencimento);
-        const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
+            estoque.forEach((item, index) => {
+                const dataAtual = new Date();
+                const dataVencimento = new Date(item.vencimento);
+                const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
 
-        let saldoClass = '';
-        if (item.quantidade == 0 && !filtroZeroAtivo) return;
-        if (item.quantidade == 0) saldoClass = 'zero-saldo';  // Saldo zero
-        else if (item.quantidade < 5) saldoClass = 'baixo-saldo';  // Baixo estoque
+                let saldoClass = '';
+                if (item.quantidade == 0 && !filtroZeroAtivo) return;
+                if (item.quantidade == 0) saldoClass = 'zero-saldo';
+                else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
-        let saldoClass = '';
-if (item.quantidade == 0 && !filtroZeroAtivo) return;
-if (item.quantidade == 0) saldoClass = 'zero-saldo';  // Saldo zero
-else if (item.quantidade < 5) saldoClass = 'baixo-saldo';  // Baixo estoque
+                let vencidoClass = '';
+                if (dataVencimento < dataAtual && !filtroVencidoAtivo) return;
+                if (dataVencimento < dataAtual) vencidoClass = 'vencido';
+                else if (diferencaDias <= 4) vencidoClass = 'prestes-vencer';
 
-let vencidoClass = '';
-if (dataVencimento < dataAtual && !filtroVencidoAtivo) return;
-if (dataVencimento < dataAtual) vencidoClass = 'vencido';
-else if (diferencaDias <= 4) vencidoClass = 'prestes-vencer';
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.item}</td>
+                    <td>${item.descricao}</td>
+                    <td>${item.categoria}</td>
+                    <td class="${saldoClass}" id="quantidade-${index}">${item.quantidade}</td>
+                    <td>${item.unidade}</td>
+                    <td>${item.valor}</td>
+                    <td class="${vencidoClass}" id="lote-${index}">${item.lote}</td>
+                    <td>
+                        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
+                        <button class="small-btn" onclick="audit(${index})">Audit</button>
+                    </td>
+                `;
+                tabelaBody.appendChild(linha);
+            });
+        }
 
-// Criação da linha com a cor do texto
-const linha = document.createElement('tr');
-linha.classList.add(saldoClass, vencidoClass); // Aplica a classe à linha inteira
-
-// Define a cor do texto baseado no saldo ou vencimento
-let corTexto = ''; 
-if (saldoClass === 'baixo-saldo') corTexto = 'color: #FF6F00'; // Texto laranja para baixo estoque
-if (vencidoClass === 'vencido') corTexto = 'color: red'; // Texto vermelho para vencido
-if (vencidoClass === 'prestes-vencer') corTexto = 'color: #FF4500'; // Texto laranja mais intenso para prestes a vencer
-
-linha.innerHTML = `
-    <td style="${corTexto}">${item.id}</td>
-    <td style="${corTexto}">${item.item}</td>
-    <td style="${corTexto}">${item.descricao}</td>
-    <td style="${corTexto}">${item.categoria}</td>
-    <td id="quantidade-${index}" style="${corTexto}">${item.quantidade}</td>
-    <td style="${corTexto}">${item.unidade}</td>
-    <td style="${corTexto}">${item.valor}</td>
-    <td id="lote-${index}" style="${corTexto}">${item.lote}</td>
-    <td>
-        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
-        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
-        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
-        <button class="small-btn" onclick="audit(${index})">Audit</button>
-    </td>
-`;
-
-tabelaBody.appendChild(linha);
-
-    });
-}
         function alterarQuantidade(index, valor) {
             let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             if (estoque[index].quantidade + valor < 0) return alert("Saldo não pode ser negativo!");
@@ -226,4 +211,3 @@ tabelaBody.appendChild(linha);
     </script>
 </body>
 </html>
-

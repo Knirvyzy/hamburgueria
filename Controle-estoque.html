@@ -135,20 +135,13 @@
 
                 let vencidoClass = '';
                    if (filtroVencidoAtivo && dataVencimento >= dataAtual) return; 
-if (!filtroVencidoAtivo && dataVencimento < dataAtual) return; 
-
-if (dataVencimento < dataAtual) { 
+                   if (dataVencimento < dataAtual) { 
     vencidoClass = 'vencido'; 
 } else if (diferencaDias <= 4) { 
     vencidoClass = 'prestes-vencer'; 
 }
-                if (
-                    (filtroZeroAtivo && item.quantidade != 0) || 
-                    (filtroVencidoAtivo && dataVencimento >= dataAtual) ||
-                    (!filtroZeroAtivo && !filtroVencidoAtivo)
-                ) {
-                    return;
-                }
+           if (filtroZeroAtivo && item.quantidade !== 0) return;
+if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
 
                 const linha = document.createElement('tr');
                 linha.innerHTML = `

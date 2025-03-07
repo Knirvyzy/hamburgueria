@@ -128,18 +128,19 @@
                 if (item.quantidade == 0) saldoClass = 'zero-saldo';
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
+let linha = document.createElement('tr'); linha.classList.add(saldoClass);
+
                 let vencidoClass = '';
                 if (dataVencimento < dataAtual && !filtroVencidoAtivo) return;
                 if (dataVencimento < dataAtual) vencidoClass = 'vencido';
                 else if (diferencaDias <= 4) vencidoClass = 'prestes-vencer';
 
-                const linha = document.createElement('tr');
                 linha.innerHTML = `
                     <td>${item.id}</td>
                     <td>${item.item}</td>
                     <td>${item.descricao}</td>
                     <td>${item.categoria}</td>
-                    <td class="${saldoClass}" id="quantidade-${index}">${item.quantidade}</td>
+                    <td>${item.quantidade}</td>
                     <td>${item.unidade}</td>
                     <td>${item.valor}</td>
                     <td class="${vencidoClass}" id="lote-${index}">${item.lote}</td>

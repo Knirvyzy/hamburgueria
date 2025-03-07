@@ -134,9 +134,9 @@
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
                 let vencidoClass = '';
-                   if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
-                   if (dataVencimento < dataAtual) { vencidoClass = 'vencido'; 
+                   if (filtroVencidoAtivo && dataVencimento >= dataAtual)  { vencidoClass = 'vencido'; 
         } 
+                   if (dataVencimento < dataAtual) return;
                else if (diferencaDias <= 4) { vencidoClass = 'prestes-vencer'; 
         }
                 if (

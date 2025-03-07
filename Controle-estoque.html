@@ -142,10 +142,12 @@
                     <td class="${saldoClass}" id="unidade-${index}">${item.unidade}</td>
                     <td class="${saldoClass}" id="valor-${index}">${item.valor}</td>
                     <td class="${vencidoClass} ${saldoClass}" id="lote-${index}">${item.lote}</td>
-                       <td><img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
+                       <td><div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+
+                       <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
                         <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
                         <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
-                        <button class="small-btn" onclick="audit(${index})">Audit</button>
+                        <button class="small-btn" onclick="audit(${index})">Audit</button><div>
                     </td>
                 `;
                 tabelaBody.appendChild(linha);

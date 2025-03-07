@@ -54,8 +54,13 @@
         #filterZero, #filterVencido {
             min-width: 120px; /* Aumentando a largura */
         }
-
-        .small-btn {
+         button:focus { 
+             outline: none; 
+        } 
+         button:active { transform: scale(0.98); 
+          }
+       
+       .small-btn {
             padding: 5px 8px;
             width: 80px;
         }
@@ -65,10 +70,11 @@
         .vencido { border: 2px solid red; }
         .prestes-vencer { border: 2px solid red; }
 
-        .active-filter {
-            border: 3px solid #003366;
-            background-color: #0056b3;
-        }
+        .active-filter, .active-filter:active { 
+             border: 3px solid #003366 !important; 
+            background-color: #0056b3 !important; 
+            color: white !important; 
+       }
 
         header {
             background-color: #003366; /* Azul escuro */

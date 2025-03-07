@@ -118,6 +118,18 @@
         let filtroZeroAtivo = false;
         let filtroVencidoAtivo = false;
 
+function converterParaData(lote) {
+    // Assumindo que o formato do lote é sempre ddmmaaaa (sem separadores)
+    const dia = lote.slice(0, 2);
+    const mes = lote.slice(2, 4);
+    const ano = lote.slice(4, 8);
+    
+    // Criando uma nova data com o formato correto: mês começa em 0 (Janeiro é 0)
+    const data = new Date(`${ano}-${mes}-${dia}`);
+
+    return data;
+}
+
 function carregarEstoque() {
     const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
     const tabelaBody = document.getElementById('estoqueLista');
@@ -133,16 +145,20 @@ function carregarEstoque() {
         if (item.quantidade == 0) saldoClass = 'zero-saldo';
         else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
-        let vencidoClass = '';
-        
-        // Verificar se a categoria do item é "Consumíveis" para aplicar o filtro de vencimento
-        if (item.categoria === "Consumíveis") {
-            if (filtroVencidoAtivo && dataVencimento < dataAtual) {
-                vencidoClass = 'vencido';
-            } else if (diferencaDias <= 1) {
-                vencidoClass = 'prestes-vencer';
-            }
-        }
+const dataVencimento = converterParaData(item.lote); // Convertendo o lote para data
+const dataAtual = new Date();
+const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
+
+let vencidoClass = '';
+
+// Verificando se a categoria é "Consumíveis" e aplicando a lógica de vencimento
+if (item.categoria === "Consumíveis") {
+    if (filtroVencidoAtivo && dataVencimento < dataAtual) {
+        vencidoClass = 'vencido';
+    } else if (diferencaDias <= 1) {
+        vencidoClass = 'prestes-vencer';
+    }
+}
 
         // Aplica os filtros de saldo zero e vencidos
         if (filtroZeroAtivo && item.quantidade !== 0) return;

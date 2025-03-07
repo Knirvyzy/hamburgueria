@@ -26,8 +26,14 @@
             height: 20px;
             margin-right: 10px;
             margin-left: 10px;
+            display: inline-block; 
+            vertical-align: middle;
         }
-
+       .small-btn {
+           display: inline-block;
+           vertical-align: middle;
+            margin: 0 5px; 
+      }
         .filter-container {
             display: flex;
             align-items: center;
@@ -136,20 +142,13 @@
                 const linha = document.createElement('tr');
                 linha.innerHTML = `
                     <td class="${saldoClass}" id="id-${index}">${item.id}</td>
-
                     <td class="${saldoClass}" id="item-${index}">${item.item}</td>
-
                     <td class="${saldoClass}" id="descricao-${index}">${item.descricao}</td>
-
                     <td class="${saldoClass}" id="categoria-${index}">${item.categoria}</td>
-
                     <td class="${saldoClass}" id="quantidade-${index}">${item.quantidade}</td>
-
                     <td class="${saldoClass}" id="unidade-${index}">${item.unidade}</td>
                     <td class="${saldoClass}" id="valor-${index}">${item.valor}</td>
-
                     <td class="${vencidoClass} ${saldoClass}" id="lote-${index}">${item.lote}</td>
-
                         <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
                         <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
                         <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>

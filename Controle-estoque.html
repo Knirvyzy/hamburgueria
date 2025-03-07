@@ -26,14 +26,7 @@
             height: 20px;
             margin-right: 10px;
             margin-left: 10px;
-            display: inline-block; 
-            vertical-align: middle;
         }
-       .small-btn {
-           display: inline-block;
-           vertical-align: middle;
-            margin: 0 5px; 
-      }
         .filter-container {
             display: flex;
             align-items: center;
@@ -149,7 +142,7 @@
                     <td class="${saldoClass}" id="unidade-${index}">${item.unidade}</td>
                     <td class="${saldoClass}" id="valor-${index}">${item.valor}</td>
                     <td class="${vencidoClass} ${saldoClass}" id="lote-${index}">${item.lote}</td>
-                        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
+                       <td><img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
                         <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
                         <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
                         <button class="small-btn" onclick="audit(${index})">Audit</button>

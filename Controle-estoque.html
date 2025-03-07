@@ -119,40 +119,45 @@
             tabelaBody.innerHTML = '';
 
             estoque.forEach((item, index) => {
-                const dataAtual = new Date();
-                const dataVencimento = new Date(item.vencimento);
-                const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
+    const dataAtual = new Date();
+    const dataVencimento = new Date(item.vencimento);
+    const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
 
-                let saldoClass = '';
-                if (item.quantidade == 0 && !filtroZeroAtivo) return;
-                if (item.quantidade == 0) saldoClass = 'zero-saldo';
-                else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
+    let saldoClass = '';
+    if (item.quantidade == 0 && !filtroZeroAtivo) {
+        return; // Não cria a linha se filtroZero estiver desativado e quantidade for 0
+    }
+    if (item.quantidade == 0) saldoClass = 'zero-saldo';
+    else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
-let linha = document.createElement('tr'); linha.classList.add(saldoClass);
+    let vencidoClass = '';
+    if (dataVencimento < dataAtual && !filtroVencidoAtivo) {
+        return; // Não cria a linha se filtroVencido estiver desativado e o item estiver vencido
+    }
+    if (dataVencimento < dataAtual) vencidoClass = 'vencido';
+    else if (diferencaDias <= 4) vencidoClass = 'prestes-vencer';
 
-                let vencidoClass = '';
-                if (dataVencimento < dataAtual && !filtroVencidoAtivo) return;
-                if (dataVencimento < dataAtual) vencidoClass = 'vencido';
-                else if (diferencaDias <= 4) vencidoClass = 'prestes-vencer';
-
-                linha.innerHTML = `
-                    <td>${item.id}</td>
-                    <td>${item.item}</td>
-                    <td>${item.descricao}</td>
-                    <td>${item.categoria}</td>
-                    <td>${item.quantidade}</td>
-                    <td>${item.unidade}</td>
-                    <td>${item.valor}</td>
-                    <td class="${vencidoClass}" id="lote-${index}">${item.lote}</td>
-                    <td>
-                        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
-                        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
-                        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
-                        <button class="small-btn" onclick="audit(${index})">Audit</button>
-                    </td>
-                `;
-                tabelaBody.appendChild(linha);
-            });
+    // Cria a linha normalmente
+    let linha = document.createElement('tr');
+    linha.classList.add(saldoClass);
+    linha.innerHTML = `
+        <td>${item.id}</td>
+        <td>${item.item}</td>
+        <td>${item.descricao}</td>
+        <td>${item.categoria}</td>
+        <td>${item.quantidade}</td>
+        <td>${item.unidade}</td>
+        <td>${item.valor}</td>
+        <td class="${vencidoClass}" id="lote-${index}">${item.lote}</td>
+        <td>
+            <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
+            <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
+            <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
+            <button class="small-btn" onclick="audit(${index})">Audit</button>
+        </td>
+    `;
+    tabelaBody.appendChild(linha);
+});
         }
 
         function alterarQuantidade(index, valor) {

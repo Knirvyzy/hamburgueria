@@ -139,7 +139,7 @@ function carregarEstoque() {
         if (item.categoria === "Consumíveis") {
             if (filtroVencidoAtivo && dataVencimento < dataAtual) {
                 vencidoClass = 'vencido';
-            } else if (diferencaDias <= 2) {
+            } else if (diferencaDias <= 1) {
                 vencidoClass = 'prestes-vencer';
             }
         }

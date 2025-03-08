@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Estoque</title>
-    <link rel="stylesheet" href="style.css">
     <style>
         table {
             width: 100%;
@@ -34,12 +33,10 @@
             gap: 10px;
             margin-bottom: 10px;
         }
-
         input[type="text"] {
             padding: 5px;
             width: 200px;
         }
-
         button {
             padding: 5px 10px;
             font-size: 14px;
@@ -49,35 +46,28 @@
             border: none;
             cursor: pointer;
         }
-
         #filterZero, #filterVencido {
             min-width: 120px;
         }
-        
         button:focus { 
             outline: none; 
         } 
-
         button:active { 
             transform: scale(0.98); 
         }
-       
         .small-btn {
             padding: 5px 8px;
             width: 80px;
         }
-
         .zero-saldo { color: red; }
         .baixo-saldo { color: #FF6F00; }
         .vencido { border: 2px solid red; }
-        .prestes-vencer { border: 2px solid red; }
-
-        .active-filter, .active-filter:active { 
+        .prestes-vencer { border: 2px solid orange; }
+        .active-filter {
             border: 3px solid #003366 !important; 
             background-color: #0056b3 !important; 
-            color: white !important; 
+            color: white !important;
         }
-
         header {
             background-color: #003366;
             color: white;
@@ -131,7 +121,6 @@
                 const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
 
                 let saldoClass = '';
-                if (item.quantidade == 0 && !filtroZeroAtivo) return;
                 if (item.quantidade == 0) saldoClass = 'zero-saldo';
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
@@ -142,10 +131,12 @@
                     vencidoClass = 'prestes-vencer'; 
                 }
 
-                if (filtroZeroAtivo && item.quantidade !== 0) return;
-                if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
-
                 const linha = document.createElement('tr');
+                linha.classList.add(vencidoClass);
+
+                if (filtroZeroAtivo && item.quantidade !== 0) linha.style.display = 'none';
+                if (filtroVencidoAtivo && !vencidoClass) linha.style.display = 'none';
+
                 linha.innerHTML = `
                     <td class="${saldoClass}" id="id-${index}">${item.id}</td>
                     <td class="${saldoClass}" id="item-${index}">${item.item}</td>
@@ -166,40 +157,6 @@
                 `;
                 tabelaBody.appendChild(linha);
             });
-        }
-
-        function alterarQuantidade(index, valor) {
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            if (estoque[index].quantidade + valor < 0) return alert("Saldo não pode ser negativo!");
-            estoque[index].quantidade += valor;
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            registrarMovimentacao(estoque[index].id, valor);
-            carregarEstoque();
-        }
-
-        function audit(index) {
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            let novoValor = parseInt(prompt("Digite a nova quantidade:", estoque[index].quantidade));
-            if (isNaN(novoValor) || novoValor < 0) return alert("Valor inválido!");
-            let diferenca = novoValor - estoque[index].quantidade;
-            estoque[index].quantidade = novoValor;
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            registrarMovimentacao(estoque[index].id, diferenca);
-            carregarEstoque();
-        }
-
-        function registrarMovimentacao(id, quantidade) {
-            let historico = JSON.parse(localStorage.getItem('historico')) || [];
-            historico.push({ id, quantidade, data: new Date().toISOString() });
-            localStorage.setItem('historico', JSON.stringify(historico));
-        }
-
-        function excluirItem(index) {
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            registrarMovimentacao(estoque[index].id, -estoque[index].quantidade);
-            estoque.splice(index, 1);
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            carregarEstoque();
         }
 
         function toggleFiltroZero() {

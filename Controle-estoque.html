@@ -54,13 +54,15 @@
         #filterZero, #filterVencido {
             min-width: 120px; /* Aumentando a largura */
         }
-         button:focus { 
-             outline: none; 
+
+        button:focus { 
+            outline: none; 
         } 
-         button:active { transform: scale(0.98); 
-          }
-       
-       .small-btn {
+        button:active { 
+            transform: scale(0.98); 
+        }
+
+        .small-btn {
             padding: 5px 8px;
             width: 80px;
         }
@@ -68,13 +70,13 @@
         .zero-saldo { color: red; }
         .baixo-saldo { color: #FF6F00; } /* Laranja */
         .vencido { border: 2px solid red; }
-        .prestes-vencer { border: 2px solid red; }
+        .prestes-vencer { border: 2px solid orange; }
 
         .active-filter, .active-filter:active { 
-             border: 3px solid #003366 !important; 
+            border: 3px solid #003366 !important; 
             background-color: #0056b3 !important; 
             color: white !important; 
-       }
+        }
 
         header {
             background-color: #003366; /* Azul escuro */
@@ -118,6 +120,27 @@
         let filtroZeroAtivo = false;
         let filtroVencidoAtivo = false;
 
+        // Função para verificar a validade do lote e aplicar a classe correspondente
+        function validarDataValidade(lote, dataAtual) {
+            let loteData = lote.substring(0, 2) + "/" + lote.substring(2, 4) + "/" + lote.substring(4, 8);
+            let dataLote = new Date(loteData.split("/").reverse().join("-"));
+            let dataHoje = new Date(dataAtual.split("/").reverse().join("-"));
+
+            // Calcular a diferença em dias
+            let diffTime = Math.abs(dataHoje - dataLote);
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            // Verifica se está vencido ou prestes a vencer
+            if (dataLote < dataHoje) {
+                return 'vencido'; // Produto vencido
+            } else if (diffDays <= 4) {
+                return 'prestes-vencer'; // Produto prestes a vencer
+            } else {
+                return ''; // Produto válido
+            }
+        }
+
+        // Função para carregar o estoque
         function carregarEstoque() {
             const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             const tabelaBody = document.getElementById('estoqueLista');
@@ -125,24 +148,21 @@
 
             estoque.forEach((item, index) => {
                 const dataAtual = new Date();
-                const dataVencimento = new Date(item.vencimento);
-                const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
-
+                const lote = item.lote;
+                const statusValidade = validarDataValidade(lote, dataAtual.toLocaleDateString('pt-BR'));
+                
                 let saldoClass = '';
                 if (item.quantidade == 0 && !filtroZeroAtivo) return;
                 if (item.quantidade == 0) saldoClass = 'zero-saldo';
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
                 let vencidoClass = '';
-            if (filtroVencidoAtivo && dataVencimento < dataAtual) { vencidoClass = 'vencido';
-        }
-                   if (dataVencimento < dataAtual) { 
-    vencidoClass = 'vencido'; 
-} else if (diferencaDias <= 4) { 
-    vencidoClass = 'prestes-vencer'; 
-}
-           if (filtroZeroAtivo && item.quantidade !== 0) return;
-if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
+                if (filtroVencidoAtivo && statusValidade === 'vencido') { vencidoClass = 'vencido'; }
+                if (statusValidade === 'vencido') { vencidoClass = 'vencido'; }
+                else if (statusValidade === 'prestes-vencer') { vencidoClass = 'prestes-vencer'; }
+
+                if (filtroZeroAtivo && item.quantidade !== 0) return;
+                if (filtroVencidoAtivo && statusValidade !== 'vencido') return;
 
                 const linha = document.createElement('tr');
                 linha.innerHTML = `
@@ -165,52 +185,21 @@ if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
             });
         }
 
-        function alterarQuantidade(index, valor) {
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            if (estoque[index].quantidade + valor < 0) return alert("Saldo não pode ser negativo!");
-            estoque[index].quantidade += valor;
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            registrarMovimentacao(estoque[index].id, valor);
-            carregarEstoque();
-        }
-
-        function audit(index) {
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            let novoValor = parseInt(prompt("Digite a nova quantidade:", estoque[index].quantidade));
-            if (isNaN(novoValor) || novoValor < 0) return alert("Valor inválido!");
-            let diferenca = novoValor - estoque[index].quantidade;
-            estoque[index].quantidade = novoValor;
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            registrarMovimentacao(estoque[index].id, diferenca);
-            carregarEstoque();
-        }
-
-        function registrarMovimentacao(id, quantidade) {
-            let historico = JSON.parse(localStorage.getItem('historico')) || [];
-            historico.push({ id, quantidade, data: new Date().toISOString() });
-            localStorage.setItem('historico', JSON.stringify(historico));
-        }
-
-        function excluirItem(index) {
-            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            registrarMovimentacao(estoque[index].id, -estoque[index].quantidade);
-            estoque.splice(index, 1);
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            carregarEstoque();
-        }
-
+        // Função para aplicar filtro de saldo zero
         function toggleFiltroZero() {
             filtroZeroAtivo = !filtroZeroAtivo;
             document.getElementById('filterZero').classList.toggle('active-filter');
             carregarEstoque();
         }
 
+        // Função para aplicar filtro de vencidos
         function toggleFiltroVencido() {
             filtroVencidoAtivo = !filtroVencidoAtivo;
             document.getElementById('filterVencido').classList.toggle('active-filter');
             carregarEstoque();
         }
 
+        // Função para filtrar itens
         function filtrarItens() {
             const filtro = document.getElementById('filtro').value.toLowerCase();
             document.querySelectorAll('#estoqueLista tr').forEach(linha => {
@@ -218,6 +207,7 @@ if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
             });
         }
 
+        // Função chamada ao carregar a página
         window.onload = carregarEstoque;
     </script>
 </body>

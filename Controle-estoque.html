@@ -123,40 +123,26 @@
             const tabelaBody = document.getElementById('estoqueLista');
             tabelaBody.innerHTML = '';
 
-            const dataAtual = new Date(); // Data de hoje
-
             estoque.forEach((item, index) => {
-                let vencidoClass = '';
+                const dataAtual = new Date();
+                const dataVencimento = new Date(item.vencimento);
+                const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
 
-                // Transformar lote em data (formato ddmmaaaa)
-                let loteStr = item.lote.toString();
-                if (loteStr.length === 8) { // Garantir que tem o formato correto
-                    let dia = parseInt(loteStr.substring(0, 2));
-                    let mes = parseInt(loteStr.substring(2, 4)) - 1; // Mês em JavaScript começa do 0
-                    let ano = parseInt(loteStr.substring(4, 8));
-                    let dataLote = new Date(ano, mes, dia);
-
-                    let diferencaDias = Math.ceil((dataLote - dataAtual) / (1000 * 60 * 60 * 24));
-
-                    if (dataLote < dataAtual) {
-                        vencidoClass = 'vencido'; // Produto vencido
-                    } else if (diferencaDias <= 4) {
-                        vencidoClass = 'prestes-vencer'; // Produto prestes a vencer (prazo de 4 dias)
-                    }
-
-                    // Filtro de vencidos ativado? Se sim, mostrar apenas vencidos
-                    if (filtroVencidoAtivo && dataLote >= dataAtual) return;
-                }
-
-                // Filtro de saldo zero
                 let saldoClass = '';
                 if (item.quantidade == 0 && !filtroZeroAtivo) return;
                 if (item.quantidade == 0) saldoClass = 'zero-saldo';
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
-                // Filtro de vencidos
-                if (filtroZeroAtivo && item.quantidade !== 0) return;
-                if (filtroVencidoAtivo && vencidoClass !== 'vencido') return;
+                let vencidoClass = '';
+            if (filtroVencidoAtivo && dataVencimento < dataAtual) { vencidoClass = 'vencido';
+        }
+                   if (dataVencimento < dataAtual) { 
+    vencidoClass = 'vencido'; 
+} else if (diferencaDias <= 4) { 
+    vencidoClass = 'prestes-vencer'; 
+}
+           if (filtroZeroAtivo && item.quantidade !== 0) return;
+if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
 
                 const linha = document.createElement('tr');
                 linha.innerHTML = `
@@ -227,11 +213,8 @@
 
         function filtrarItens() {
             const filtro = document.getElementById('filtro').value.toLowerCase();
-            const linhas = document.querySelectorAll('#estoqueTabela tbody tr');
-
-            linhas.forEach(linha => {
-                const texto = linha.innerText.toLowerCase();
-                linha.style.display = texto.includes(filtro) ? '' : 'none';
+            document.querySelectorAll('#estoqueLista tr').forEach(linha => {
+                linha.style.display = linha.innerText.toLowerCase().includes(filtro) ? '' : 'none';
             });
         }
 

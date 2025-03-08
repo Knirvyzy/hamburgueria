@@ -4,137 +4,221 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Estoque</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* Estilo da tabela */
         table {
             width: 100%;
             border-collapse: collapse;
+            text-align: center;
         }
         th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             padding: 8px;
-            text-align: left;
+            text-align: center;
+            white-space: nowrap;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #f4f4f4;
         }
-        /* Estilo para itens vencidos */
-        .vencido {
-            border: 2px solid red;
-            background-color: #fdd;
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            margin-left: 10px;
         }
-        /* Estilo para itens prestes a vencer */
-        .prestes-vencer {
-            border: 2px solid orange;
-            background-color: #ffebcd;
+        .filter-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
         }
-        /* Estilo do botão de filtro */
-        .filtro-vencido {
-            margin: 10px 0;
+
+        input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+
+        button {
+            padding: 5px 10px;
+            font-size: 14px;
+            height: 32px;
+            background-color: #003366; /* Azul escuro */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Ajustes para botões */
+        #filterZero, #filterVencido {
+            min-width: 120px; /* Aumentando a largura */
+        }
+         button:focus { 
+             outline: none; 
+        } 
+         button:active { transform: scale(0.98); 
+          }
+       
+       .small-btn {
+            padding: 5px 8px;
+            width: 80px;
+        }
+
+        .zero-saldo { color: red; }
+        .baixo-saldo { color: #FF6F00; } /* Laranja */
+        .vencido { border: 2px solid red !important; background-color: #ffcccc; }
+        .prestes-vencer { border: 2px solid orange !important; background-color: #fff0cc; }
+
+        .active-filter, .active-filter:active { 
+             border: 3px solid #003366 !important; 
+            background-color: #0056b3 !important; 
+            color: white !important; 
+       }
+
+        header {
+            background-color: #003366; /* Azul escuro */
+            color: white;
+            padding: 10px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>Controle de Estoque</h1>
+    </header>
 
-    <h1>Controle de Estoque</h1>
+    <main>
+        <div class="filter-container">
+            <input type="text" id="filtro" placeholder="Filtrar itens..." onkeyup="filtrarItens()">
+            <button id="filterZero" onclick="toggleFiltroZero()">Saldo Zero</button>
+            <button id="filterVencido" onclick="toggleFiltroVencido()">Vencidos</button>
+        </div>
 
-    <!-- Filtro de itens vencidos -->
-    <button id="filtroVencido" class="filtro-vencido">Mostrar Apenas Vencidos</button>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Item</th>
-                <th>Descrição</th>
-                <th>Categoria</th>
-                <th>Quantidade</th>
-                <th>Unidade</th>
-                <th>Valor</th>
-                <th>Lote</th>
-                <th>Ação</th>
-            </tr>
-        </thead>
-        <tbody id="estoqueLista"></tbody>
-    </table>
+        <table id="estoqueTabela">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Item</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Quantidade</th>
+                    <th>Unidade</th>
+                    <th>Valor</th>
+                    <th>Lote</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="estoqueLista"></tbody>
+        </table>
+    </main>
 
     <script>
+        let filtroZeroAtivo = false;
         let filtroVencidoAtivo = false;
 
-        // Função para carregar os itens do estoque
         function carregarEstoque() {
             const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             const tabelaBody = document.getElementById('estoqueLista');
             tabelaBody.innerHTML = '';
 
-            estoque.forEach((item) => {
+            estoque.forEach((item, index) => {
                 const dataAtual = new Date();
-                
-                // Extraímos a data de vencimento a partir do lote (no formato ddmmaaaa)
-                const lote = item.lote;
-                const dia = parseInt(lote.substring(0, 2), 10);
-                const mes = parseInt(lote.substring(2, 4), 10) - 1; // Meses começam de 0 no JavaScript
-                const ano = parseInt(lote.substring(4, 8), 10);
-                const dataVencimento = new Date(ano, mes, dia);
-                
+                const dataVencimento = new Date(item.vencimento);
                 const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
 
+                let saldoClass = '';
+                if (item.quantidade == 0 && !filtroZeroAtivo) return;
+                if (item.quantidade == 0) saldoClass = 'zero-saldo';
+                else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
+
                 let vencidoClass = '';
-                // Verificar se o item está vencido ou prestes a vencer
-                if (diferencaDias < 0) {
-                    vencidoClass = 'vencido';
-                } else if (diferencaDias <= 4) {
-                    vencidoClass = 'prestes-vencer';
+                if (dataVencimento < dataAtual) { 
+                    vencidoClass = 'vencido'; 
+                } else if (diferencaDias <= 4) { 
+                    vencidoClass = 'prestes-vencer'; 
                 }
 
-                // Não exibir o item se o filtro de vencido estiver ativo e o item não estiver vencido
-                if (filtroVencidoAtivo && vencidoClass !== 'vencido') {
-                    return;
-                }
+                if (filtroZeroAtivo && item.quantidade !== 0) return;
+                if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
 
-                // Criação da linha da tabela
-                const tr = document.createElement('tr');
-                tr.classList.add(vencidoClass);
-
-                tr.innerHTML = `
-                    <td>${item.id}</td>
-                    <td>${item.item}</td>
-                    <td>${item.descricao}</td>
-                    <td>${item.categoria}</td>
-                    <td>${item.quantidade}</td>
-                    <td>${item.unidade}</td>
-                    <td>${item.valor}</td>
-                    <td>${item.lote}</td>
-                    <td><img src="Imagens/Excluir.png" alt="Excluir" class="delete-icon" onclick="deletarItem(${item.id})"></td>
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+                    <td class="${saldoClass}" id="id-${index}">${item.id}</td>
+                    <td class="${saldoClass}" id="item-${index}">${item.item}</td>
+                    <td class="${saldoClass}" id="descricao-${index}">${item.descricao}</td>
+                    <td class="${saldoClass}" id="categoria-${index}">${item.categoria}</td>
+                    <td class="${saldoClass}" id="quantidade-${index}">${item.quantidade}</td>
+                    <td class="${saldoClass}" id="unidade-${index}">${item.unidade}</td>
+                    <td class="${saldoClass}" id="valor-${index}">${item.valor}</td>
+                    <td class="${vencidoClass} ${saldoClass}" id="lote-${index}">${item.lote}</td>
+                    <td><div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
+                        <button class="small-btn" onclick="audit(${index})">Audit</button>
+                    </div></td>
                 `;
-                
-                tabelaBody.appendChild(tr);
+                tabelaBody.appendChild(linha);
             });
         }
 
-        // Função para ativar/desativar o filtro de vencidos
-        document.getElementById('filtroVencido').addEventListener('click', () => {
-            filtroVencidoAtivo = !filtroVencidoAtivo;
-            if (filtroVencidoAtivo) {
-                document.getElementById('filtroVencido').innerText = 'Mostrar Todos';
-            } else {
-                document.getElementById('filtroVencido').innerText = 'Mostrar Apenas Vencidos';
-            }
-            carregarEstoque(); // Recarregar a lista após o filtro ser alterado
-        });
-
-        // Função para deletar item (exemplo simples)
-        function deletarItem(id) {
-            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            const novoEstoque = estoque.filter(item => item.id !== id);
-            localStorage.setItem('estoque', JSON.stringify(novoEstoque));
-            carregarEstoque(); // Atualiza a tabela após a exclusão
+        function alterarQuantidade(index, valor) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            if (estoque[index].quantidade + valor < 0) return alert("Saldo não pode ser negativo!");
+            estoque[index].quantidade += valor;
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            registrarMovimentacao(estoque[index].id, valor);
+            carregarEstoque();
         }
 
-        // Carregar o estoque ao iniciar
-        carregarEstoque();
-    </script>
+        function audit(index) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            let novoValor = parseInt(prompt("Digite a nova quantidade:", estoque[index].quantidade));
+            if (isNaN(novoValor) || novoValor < 0) return alert("Valor inválido!");
+            let diferenca = novoValor - estoque[index].quantidade;
+            estoque[index].quantidade = novoValor;
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            registrarMovimentacao(estoque[index].id, diferenca);
+            carregarEstoque();
+        }
 
+        function registrarMovimentacao(id, quantidade) {
+            let historico = JSON.parse(localStorage.getItem('historico')) || [];
+            historico.push({ id, quantidade, data: new Date().toISOString() });
+            localStorage.setItem('historico', JSON.stringify(historico));
+        }
+
+        function excluirItem(index) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            registrarMovimentacao(estoque[index].id, -estoque[index].quantidade);
+            estoque.splice(index, 1);
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            carregarEstoque();
+        }
+
+        function toggleFiltroZero() {
+            filtroZeroAtivo = !filtroZeroAtivo;
+            document.getElementById('filterZero').classList.toggle('active-filter');
+            carregarEstoque();
+        }
+
+        function toggleFiltroVencido() {
+            filtroVencidoAtivo = !filtroVencidoAtivo;
+            document.getElementById('filterVencido').classList.toggle('active-filter');
+            carregarEstoque();
+        }
+
+        function filtrarItens() {
+            const filtro = document.getElementById('filtro').value.toLowerCase();
+            document.querySelectorAll('#estoqueLista tr').forEach(linha => {
+                linha.style.display = linha.innerText.toLowerCase().includes(filtro) ? '' : 'none';
+            });
+        }
+
+        window.onload = carregarEstoque;
+    </script>
 </body>
 </html>
 

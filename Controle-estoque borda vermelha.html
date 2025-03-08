@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Estoque</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .delete-icon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+        .filter-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+
+        button {
+            padding: 5px 10px;
+            font-size: 14px;
+            height: 32px;
+            background-color: #003366; /* Azul escuro */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Ajustes para botões */
+        #filterZero, #filterVencido {
+            min-width: 120px; /* Aumentando a largura */
+        }
+         button:focus { 
+             outline: none; 
+        } 
+         button:active { transform: scale(0.98); 
+          }
+       
+       .small-btn {
+            padding: 5px 8px;
+            width: 80px;
+        }
+
+        .zero-saldo { color: red; }
+        .baixo-saldo { color: #FF6F00; } /* Laranja */
+        .vencido { border: 2px solid red; }
+        .prestes-vencer { border: 2px solid red; }
+
+        .active-filter, .active-filter:active { 
+             border: 3px solid #003366 !important; 
+            background-color: #0056b3 !important; 
+            color: white !important; 
+       }
+
+        header {
+            background-color: #003366; /* Azul escuro */
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Controle de Estoque</h1>
+    </header>
+
+    <main>
+        <div class="filter-container">
+            <input type="text" id="filtro" placeholder="Filtrar itens..." onkeyup="filtrarItens()">
+            <button id="filterZero" onclick="toggleFiltroZero()">Saldo Zero</button>
+            <button id="filterVencido" onclick="toggleFiltroVencido()">Vencidos</button>
+        </div>
+
+        <table id="estoqueTabela">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Item</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Quantidade</th>
+                    <th>Unidade</th>
+                    <th>Valor</th>
+                    <th>Lote</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="estoqueLista"></tbody>
+        </table>
+    </main>
+
+    <script>
+        let filtroZeroAtivo = false;
+        let filtroVencidoAtivo = false;
+
+        function carregarEstoque() {
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            const tabelaBody = document.getElementById('estoqueLista');
+            tabelaBody.innerHTML = '';
+
+            const dataAtual = new Date(); // Data de hoje
+
+            estoque.forEach((item, index) => {
+                let vencidoClass = '';
+
+                // Transformar lote em data (formato ddmmaaaa)
+                let loteStr = item.lote.toString();
+                if (loteStr.length === 8) { // Garantir que tem o formato correto
+                    let dia = parseInt(loteStr.substring(0, 2));
+                    let mes = parseInt(loteStr.substring(2, 4)) - 1; // Mês em JavaScript começa do 0
+                    let ano = parseInt(loteStr.substring(4, 8));
+                    let dataLote = new Date(ano, mes, dia);
+
+                    let diferencaDias = Math.ceil((dataLote - dataAtual) / (1000 * 60 * 60 * 24));
+
+                    if (dataLote < dataAtual) {
+                        vencidoClass = 'vencido'; // Produto vencido
+                    } else if (diferencaDias <= 4) {
+                        vencidoClass = 'prestes-vencer'; // Produto prestes a vencer (prazo de 4 dias)
+                    }
+
+                    // Filtro de vencidos ativado? Se sim, mostrar apenas vencidos
+                    if (filtroVencidoAtivo && dataLote >= dataAtual) return;
+                }
+
+                // Filtro de saldo zero
+                let saldoClass = '';
+                if (item.quantidade == 0 && !filtroZeroAtivo) return;
+                if (item.quantidade == 0) saldoClass = 'zero-saldo';
+                else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
+
+                // Filtro de vencidos
+                if (filtroZeroAtivo && item.quantidade !== 0) return;
+                if (filtroVencidoAtivo && vencidoClass !== 'vencido') return;
+
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+                    <td class="${saldoClass}" id="id-${index}">${item.id}</td>
+                    <td class="${saldoClass}" id="item-${index}">${item.item}</td>
+                    <td class="${saldoClass}" id="descricao-${index}">${item.descricao}</td>
+                    <td class="${saldoClass}" id="categoria-${index}">${item.categoria}</td>
+                    <td class="${saldoClass}" id="quantidade-${index}">${item.quantidade}</td>
+                    <td class="${saldoClass}" id="unidade-${index}">${item.unidade}</td>
+                    <td class="${saldoClass}" id="valor-${index}">${item.valor}</td>
+                    <td class="${vencidoClass} ${saldoClass}" id="lote-${index}">${item.lote}</td>
+                    <td><div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
+                        <button class="small-btn" onclick="audit(${index})">Audit</button>
+                    </div></td>
+                `;
+                tabelaBody.appendChild(linha);
+            });
+        }
+
+        function alterarQuantidade(index, valor) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            if (estoque[index].quantidade + valor < 0) return alert("Saldo não pode ser negativo!");
+            estoque[index].quantidade += valor;
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            registrarMovimentacao(estoque[index].id, valor);
+            carregarEstoque();
+        }
+
+        function audit(index) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            let novoValor = parseInt(prompt("Digite a nova quantidade:", estoque[index].quantidade));
+            if (isNaN(novoValor) || novoValor < 0) return alert("Valor inválido!");
+            let diferenca = novoValor - estoque[index].quantidade;
+            estoque[index].quantidade = novoValor;
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            registrarMovimentacao(estoque[index].id, diferenca);
+            carregarEstoque();
+        }
+
+        function registrarMovimentacao(id, quantidade) {
+            let historico = JSON.parse(localStorage.getItem('historico')) || [];
+            historico.push({ id, quantidade, data: new Date().toISOString() });
+            localStorage.setItem('historico', JSON.stringify(historico));
+        }
+
+        function excluirItem(index) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            registrarMovimentacao(estoque[index].id, -estoque[index].quantidade);
+            estoque.splice(index, 1);
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            carregarEstoque();
+        }
+
+        function toggleFiltroZero() {
+            filtroZeroAtivo = !filtroZeroAtivo;
+            document.getElementById('filterZero').classList.toggle('active-filter');
+            carregarEstoque();
+        }
+
+        function toggleFiltroVencido() {
+            filtroVencidoAtivo = !filtroVencidoAtivo;
+            document.getElementById('filterVencido').classList.toggle('active-filter');
+            carregarEstoque();
+        }
+
+        function filtrarItens() {
+            const filtro = document.getElementById('filtro').value.toLowerCase();
+            const linhas = document.querySelectorAll('#estoqueTabela tbody tr');
+
+            linhas.forEach(linha => {
+                const texto = linha.innerText.toLowerCase();
+                linha.style.display = texto.includes(filtro) ? '' : 'none';
+            });
+        }
+
+        window.onload = carregarEstoque;
+    </script>
+</body>
+</html>
+

@@ -98,7 +98,7 @@
                     <th>Quantidade</th>
                     <th>Unidade</th>
                     <th>Valor</th>
-                    <th>Lote</th>
+                    <th>Vencimento</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -115,7 +115,14 @@
             const tabelaBody = document.getElementById('estoqueLista');
             tabelaBody.innerHTML = '';
 
+            if (estoque.length === 0) {
+                tabelaBody.innerHTML = '<tr><td colspan="9">Nenhum item no estoque</td></tr>';
+                return;
+            }
+
             estoque.forEach((item, index) => {
+                if (!item || !item.id || !item.item || !item.quantidade || !item.vencimento) return;
+
                 const dataAtual = new Date();
                 const dataVencimento = new Date(item.vencimento);
                 const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
@@ -145,7 +152,7 @@
                     <td class="${saldoClass}" id="quantidade-${index}">${item.quantidade}</td>
                     <td class="${saldoClass}" id="unidade-${index}">${item.unidade}</td>
                     <td class="${saldoClass}" id="valor-${index}">${item.valor}</td>
-                    <td class="${vencidoClass} ${saldoClass}" id="lote-${index}">${item.lote}</td>
+                    <td class="${vencidoClass} ${saldoClass}" id="vencimento-${index}">${item.vencimento}</td>
                     <td>
                         <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                             <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">

@@ -52,32 +52,42 @@
 
         /* Ajustes para botões */
         #filterZero, #filterVencido {
-            min-width: 120px; /* Aumentando a largura */
+            min-width: 120px;
         }
-         button:focus { 
-             outline: none; 
+
+        button:focus { 
+            outline: none; 
         } 
-         button:active { transform: scale(0.98); 
-          }
+
+        button:active { 
+            transform: scale(0.98); 
+        }
        
-       .small-btn {
+        .small-btn {
             padding: 5px 8px;
             width: 80px;
         }
 
-        .zero-saldo { color: red; }
-        .baixo-saldo { color: #FF6F00; } /* Laranja */
-        .vencido { border: 2px solid red !important; background-color: #ffcccc; }
-        .prestes-vencer { border: 2px solid orange !important; background-color: #fff0cc; }
+        .zero-saldo { 
+            color: red; 
+        }
+
+        .baixo-saldo { 
+            color: #FF6F00; /* Laranja */
+        } 
+
+        .vencido { 
+            border: 2px solid red !important;
+        }
 
         .active-filter, .active-filter:active { 
-             border: 3px solid #003366 !important; 
+            border: 3px solid #003366 !important; 
             background-color: #0056b3 !important; 
             color: white !important; 
-       }
+        }
 
         header {
-            background-color: #003366; /* Azul escuro */
+            background-color: #003366;
             color: white;
             padding: 10px;
             text-align: center;
@@ -136,8 +146,6 @@
                 let vencidoClass = '';
                 if (dataVencimento < dataAtual) { 
                     vencidoClass = 'vencido'; 
-                } else if (diferencaDias <= 1) { 
-                    vencidoClass = 'prestes-vencer'; 
                 }
 
                 if (filtroZeroAtivo && item.quantidade !== 0) return;

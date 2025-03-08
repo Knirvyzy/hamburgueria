@@ -133,7 +133,7 @@
             // Verifica se está vencido ou prestes a vencer
             if (dataLote < dataHoje) {
                 return 'vencido'; // Produto vencido
-            } else if (diffDays <= 4) {
+            } else if (diffDays <= 1) {
                 return 'prestes-vencer'; // Produto prestes a vencer
             } else {
                 return ''; // Produto válido

@@ -34,36 +34,50 @@
             gap: 10px;
             margin-bottom: 10px;
         }
+
         input[type="text"] {
             padding: 5px;
             width: 200px;
         }
+
         button {
             padding: 5px 10px;
             font-size: 14px;
             height: 32px;
-            background-color: #003366;
+            background-color: #003366; /* Azul escuro */
             color: white;
             border: none;
             cursor: pointer;
         }
-        button:focus { outline: none; }
-        button:active { transform: scale(0.98); }
-        .small-btn {
+
+        /* Ajustes para botões */
+        #filterZero, #filterVencido {
+            min-width: 120px; /* Aumentando a largura */
+        }
+         button:focus { 
+             outline: none; 
+        } 
+         button:active { transform: scale(0.98); 
+          }
+       
+       .small-btn {
             padding: 5px 8px;
             width: 80px;
         }
+
         .zero-saldo { color: red; }
-        .baixo-saldo { color: #FF6F00; }
+        .baixo-saldo { color: #FF6F00; } /* Laranja */
         .vencido { border: 2px solid red; }
         .prestes-vencer { border: 2px solid red; }
-        .active-filter { 
-            border: 3px solid #003366 !important; 
+
+        .active-filter, .active-filter:active { 
+             border: 3px solid #003366 !important; 
             background-color: #0056b3 !important; 
             color: white !important; 
-        }
+       }
+
         header {
-            background-color: #003366;
+            background-color: #003366; /* Azul escuro */
             color: white;
             padding: 10px;
             text-align: center;
@@ -80,7 +94,6 @@
             <input type="text" id="filtro" placeholder="Filtrar itens..." onkeyup="filtrarItens()">
             <button id="filterZero" onclick="toggleFiltroZero()">Saldo Zero</button>
             <button id="filterVencido" onclick="toggleFiltroVencido()">Vencidos</button>
-            <button onclick="resetarEstoque()">Resetar Estoque</button>
         </div>
 
         <table id="estoqueTabela">
@@ -105,13 +118,6 @@
         let filtroZeroAtivo = false;
         let filtroVencidoAtivo = false;
 
-        function converterParaData(lote) {
-            const dia = lote.slice(0, 2);
-            const mes = lote.slice(2, 4);
-            const ano = lote.slice(4, 8);
-            return new Date(ano, mes - 1, dia);
-        }
-
         function carregarEstoque() {
             const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             const tabelaBody = document.getElementById('estoqueLista');
@@ -119,8 +125,8 @@
 
             estoque.forEach((item, index) => {
                 const dataAtual = new Date();
-                const dataVencimento = converterParaData(item.lote);
-                const diferencaDias = Math.ceil((dataVencimento.getTime() - dataAtual.getTime()) / (1000 * 60 * 60 * 24));
+                const dataVencimento = new Date(item.vencimento);
+                const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
 
                 let saldoClass = '';
                 if (item.quantidade == 0 && !filtroZeroAtivo) return;
@@ -128,51 +134,68 @@
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
                 let vencidoClass = '';
-                if (item.categoria === "Consumíveis") {
-                    if (filtroVencidoAtivo && dataVencimento.getTime() < dataAtual.getTime()) {
-                        vencidoClass = 'vencido';
-                    } else if (diferencaDias <= 1) {
-                        vencidoClass = 'prestes-vencer';
-                    }
-                }
-
-                if (filtroZeroAtivo && item.quantidade !== 0) return;
-                if (filtroVencidoAtivo && dataVencimento.getTime() >= dataAtual.getTime() && item.categoria === "Consumíveis") return;
+            if (filtroVencidoAtivo && dataVencimento < dataAtual) { vencidoClass = 'vencido';
+        }
+                   if (dataVencimento < dataAtual) { 
+    vencidoClass = 'vencido'; 
+} else if (diferencaDias <= 4) { 
+    vencidoClass = 'prestes-vencer'; 
+}
+           if (filtroZeroAtivo && item.quantidade !== 0) return;
+if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
 
                 const linha = document.createElement('tr');
                 linha.innerHTML = `
-                    <td class="${saldoClass}">${item.id}</td>
-                    <td class="${saldoClass}">${item.item}</td>
-                    <td class="${saldoClass}">${item.descricao}</td>
-                    <td class="${saldoClass}">${item.categoria}</td>
-                    <td class="${saldoClass}">${item.quantidade}</td>
-                    <td class="${saldoClass}">${item.unidade}</td>
-                    <td class="${saldoClass}">${item.valor}</td>
-                    <td class="${vencidoClass} ${saldoClass}">${dataVencimento.toLocaleDateString("pt-BR")}</td>
-                    <td>
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                            <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
-                            <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
-                            <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
-                            <button class="small-btn" onclick="audit(${index})">Audit</button>
-                        </div>
-                    </td>
+                    <td class="${saldoClass}" id="id-${index}">${item.id}</td>
+                    <td class="${saldoClass}" id="item-${index}">${item.item}</td>
+                    <td class="${saldoClass}" id="descricao-${index}">${item.descricao}</td>
+                    <td class="${saldoClass}" id="categoria-${index}">${item.categoria}</td>
+                    <td class="${saldoClass}" id="quantidade-${index}">${item.quantidade}</td>
+                    <td class="${saldoClass}" id="unidade-${index}">${item.unidade}</td>
+                    <td class="${saldoClass}" id="valor-${index}">${item.valor}</td>
+                    <td class="${vencidoClass} ${saldoClass}" id="lote-${index}">${item.lote}</td>
+                    <td><div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
+                        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
+                        <button class="small-btn" onclick="audit(${index})">Audit</button>
+                    </div></td>
                 `;
                 tabelaBody.appendChild(linha);
             });
         }
 
-        function excluirItem(index) {
-            if (!confirm("Tem certeza que deseja excluir este item?")) return;
+        function alterarQuantidade(index, valor) {
             let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            estoque.splice(index, 1);
+            if (estoque[index].quantidade + valor < 0) return alert("Saldo não pode ser negativo!");
+            estoque[index].quantidade += valor;
             localStorage.setItem('estoque', JSON.stringify(estoque));
+            registrarMovimentacao(estoque[index].id, valor);
             carregarEstoque();
         }
 
-        function resetarEstoque() {
-            if (!confirm("Tem certeza que deseja apagar todos os itens?")) return;
-            localStorage.removeItem('estoque');
+        function audit(index) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            let novoValor = parseInt(prompt("Digite a nova quantidade:", estoque[index].quantidade));
+            if (isNaN(novoValor) || novoValor < 0) return alert("Valor inválido!");
+            let diferenca = novoValor - estoque[index].quantidade;
+            estoque[index].quantidade = novoValor;
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            registrarMovimentacao(estoque[index].id, diferenca);
+            carregarEstoque();
+        }
+
+        function registrarMovimentacao(id, quantidade) {
+            let historico = JSON.parse(localStorage.getItem('historico')) || [];
+            historico.push({ id, quantidade, data: new Date().toISOString() });
+            localStorage.setItem('historico', JSON.stringify(historico));
+        }
+
+        function excluirItem(index) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            registrarMovimentacao(estoque[index].id, -estoque[index].quantidade);
+            estoque.splice(index, 1);
+            localStorage.setItem('estoque', JSON.stringify(estoque));
             carregarEstoque();
         }
 

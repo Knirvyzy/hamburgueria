@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Estoque</title>
+    <link rel="stylesheet" href="style.css">
     <style>
         table {
             width: 100%;
@@ -33,43 +34,52 @@
             gap: 10px;
             margin-bottom: 10px;
         }
+
         input[type="text"] {
             padding: 5px;
             width: 200px;
         }
+
         button {
             padding: 5px 10px;
             font-size: 14px;
             height: 32px;
-            background-color: #003366;
+            background-color: #003366; /* Azul escuro */
             color: white;
             border: none;
             cursor: pointer;
         }
+
         #filterZero, #filterVencido {
-            min-width: 120px;
+            min-width: 120px; /* Aumentando a largura */
         }
+
         button:focus { 
             outline: none; 
-        } 
+        }
+
         button:active { 
             transform: scale(0.98); 
         }
+
         .small-btn {
             padding: 5px 8px;
             width: 80px;
         }
+
         .zero-saldo { color: red; }
-        .baixo-saldo { color: #FF6F00; }
+        .baixo-saldo { color: #FF6F00; } /* Laranja */
         .vencido { border: 2px solid red; }
-        .prestes-vencer { border: 2px solid orange; }
-        .active-filter {
+        .prestes-vencer { border: 2px solid red; }
+
+        .active-filter, .active-filter:active { 
             border: 3px solid #003366 !important; 
             background-color: #0056b3 !important; 
-            color: white !important;
+            color: white !important; 
         }
+
         header {
-            background-color: #003366;
+            background-color: #003366; /* Azul escuro */
             color: white;
             padding: 10px;
             text-align: center;
@@ -98,7 +108,7 @@
                     <th>Quantidade</th>
                     <th>Unidade</th>
                     <th>Valor</th>
-                    <th>Vencimento</th>
+                    <th>Lote</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -110,110 +120,90 @@
         let filtroZeroAtivo = false;
         let filtroVencidoAtivo = false;
 
-        // Função para carregar estoque do localStorage
+        // Função para carregar os itens do estoque
         function carregarEstoque() {
             const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             const tabelaBody = document.getElementById('estoqueLista');
             tabelaBody.innerHTML = '';
 
-            if (estoque.length === 0) {
-                tabelaBody.innerHTML = '<tr><td colspan="9">Nenhum item no estoque</td></tr>';
-                return;
-            }
-
-            estoque.forEach((item, index) => {
-                if (!item || !item.id || !item.item || !item.quantidade || !item.vencimento) return;
-
+            estoque.forEach((item) => {
                 const dataAtual = new Date();
-                const dataVencimento = new Date(item.vencimento);
+                const lote = item.lote;
+                const dataVencimento = new Date(lote.slice(4, 8) + '-' + lote.slice(2, 4) + '-' + lote.slice(0, 2)); // Formato ddmmaaaa para a data de vencimento
                 const diferencaDias = Math.ceil((dataVencimento - dataAtual) / (1000 * 60 * 60 * 24));
 
+                // Definindo a classe do saldo
                 let saldoClass = '';
+                if (item.quantidade == 0 && !filtroZeroAtivo) return;
                 if (item.quantidade == 0) saldoClass = 'zero-saldo';
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
+                // Definindo a classe para vencidos
                 let vencidoClass = '';
-                if (dataVencimento < dataAtual) { 
-                    vencidoClass = 'vencido'; 
-                } else if (diferencaDias <= 4) { 
-                    vencidoClass = 'prestes-vencer'; 
+                if (filtroVencidoAtivo && dataVencimento < dataAtual) {
+                    vencidoClass = 'vencido';
+                } else if (diferencaDias <= 4 && dataVencimento >= dataAtual) {
+                    vencidoClass = 'prestes-vencer';
                 }
 
-                const linha = document.createElement('tr');
-                linha.classList.add(vencidoClass);
+                // Montando as linhas da tabela
+                const tr = document.createElement('tr');
+                tr.classList.add(saldoClass, vencidoClass);
 
-                // Se o filtro de saldo zero ou vencido estiver ativo, esconde a linha
-                if (filtroZeroAtivo && item.quantidade !== 0) linha.style.display = 'none';
-                if (filtroVencidoAtivo && !vencidoClass) linha.style.display = 'none';
-
-                linha.innerHTML = `
-                    <td class="${saldoClass}" id="id-${index}">${item.id}</td>
-                    <td class="${saldoClass}" id="item-${index}">${item.item}</td>
-                    <td class="${saldoClass}" id="descricao-${index}">${item.descricao}</td>
-                    <td class="${saldoClass}" id="categoria-${index}">${item.categoria}</td>
-                    <td class="${saldoClass}" id="quantidade-${index}">${item.quantidade}</td>
-                    <td class="${saldoClass}" id="unidade-${index}">${item.unidade}</td>
-                    <td class="${saldoClass}" id="valor-${index}">${item.valor}</td>
-                    <td class="${vencidoClass} ${saldoClass}" id="vencimento-${index}">${item.vencimento}</td>
-                    <td>
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                            <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
-                            <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
-                            <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
-                            <button class="small-btn" onclick="audit(${index})">Audit</button>
-                        </div>
-                    </td>
+                tr.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.item}</td>
+                    <td>${item.descricao}</td>
+                    <td>${item.categoria}</td>
+                    <td>${item.quantidade}</td>
+                    <td>${item.unidade}</td>
+                    <td>${item.valor}</td>
+                    <td>${item.lote}</td>
+                    <td><img src="Imagens/Delete.png" class="delete-icon" onclick="excluirItem(${item.id})" alt="Excluir"></td>
                 `;
-                tabelaBody.appendChild(linha);
+
+                tabelaBody.appendChild(tr);
             });
         }
 
-        // Alternar filtro de saldo zero
+        // Função para filtrar os itens com saldo zero
         function toggleFiltroZero() {
             filtroZeroAtivo = !filtroZeroAtivo;
-            document.getElementById('filterZero').classList.toggle('active-filter');
             carregarEstoque();
         }
 
-        // Alternar filtro de vencidos
+        // Função para filtrar os itens vencidos
         function toggleFiltroVencido() {
             filtroVencidoAtivo = !filtroVencidoAtivo;
-            document.getElementById('filterVencido').classList.toggle('active-filter');
             carregarEstoque();
         }
 
-        // Filtrar itens da tabela conforme o texto digitado
+        // Função de filtro de itens
         function filtrarItens() {
             const filtro = document.getElementById('filtro').value.toLowerCase();
-            document.querySelectorAll('#estoqueLista tr').forEach(linha => {
-                linha.style.display = linha.innerText.toLowerCase().includes(filtro) ? '' : 'none';
-            });
+            const rows = document.getElementById('estoqueLista').getElementsByTagName('tr');
+
+            for (let row of rows) {
+                const item = row.cells[1].textContent.toLowerCase();
+                const descricao = row.cells[2].textContent.toLowerCase();
+                if (item.includes(filtro) || descricao.includes(filtro)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
         }
 
         // Função para excluir um item
-        function excluirItem(index) {
-            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            estoque.splice(index, 1);
+        function excluirItem(id) {
+            let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            estoque = estoque.filter(item => item.id !== id);
             localStorage.setItem('estoque', JSON.stringify(estoque));
             carregarEstoque();
         }
 
-        // Função para alterar a quantidade
-        function alterarQuantidade(index, incremento) {
-            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            estoque[index].quantidade += incremento;
-            if (estoque[index].quantidade < 0) estoque[index].quantidade = 0; // Garantir que a quantidade não seja negativa
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            carregarEstoque();
-        }
-
-        // Função para auditoria (ajustar conforme necessidade)
-        function audit(index) {
-            alert('Auditando item com ID: ' + index);
-        }
-
-        // Carregar os itens ao carregar a página
-        window.onload = carregarEstoque;
+        // Carregar estoque ao iniciar
+        carregarEstoque();
     </script>
 </body>
 </html>

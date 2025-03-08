@@ -110,6 +110,7 @@
         let filtroZeroAtivo = false;
         let filtroVencidoAtivo = false;
 
+        // Função para carregar estoque do localStorage
         function carregarEstoque() {
             const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             const tabelaBody = document.getElementById('estoqueLista');
@@ -141,6 +142,7 @@
                 const linha = document.createElement('tr');
                 linha.classList.add(vencidoClass);
 
+                // Se o filtro de saldo zero ou vencido estiver ativo, esconde a linha
                 if (filtroZeroAtivo && item.quantidade !== 0) linha.style.display = 'none';
                 if (filtroVencidoAtivo && !vencidoClass) linha.style.display = 'none';
 
@@ -166,18 +168,21 @@
             });
         }
 
+        // Alternar filtro de saldo zero
         function toggleFiltroZero() {
             filtroZeroAtivo = !filtroZeroAtivo;
             document.getElementById('filterZero').classList.toggle('active-filter');
             carregarEstoque();
         }
 
+        // Alternar filtro de vencidos
         function toggleFiltroVencido() {
             filtroVencidoAtivo = !filtroVencidoAtivo;
             document.getElementById('filterVencido').classList.toggle('active-filter');
             carregarEstoque();
         }
 
+        // Filtrar itens da tabela conforme o texto digitado
         function filtrarItens() {
             const filtro = document.getElementById('filtro').value.toLowerCase();
             document.querySelectorAll('#estoqueLista tr').forEach(linha => {
@@ -185,6 +190,29 @@
             });
         }
 
+        // Função para excluir um item
+        function excluirItem(index) {
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            estoque.splice(index, 1);
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            carregarEstoque();
+        }
+
+        // Função para alterar a quantidade
+        function alterarQuantidade(index, incremento) {
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            estoque[index].quantidade += incremento;
+            if (estoque[index].quantidade < 0) estoque[index].quantidade = 0; // Garantir que a quantidade não seja negativa
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            carregarEstoque();
+        }
+
+        // Função para auditoria (ajustar conforme necessidade)
+        function audit(index) {
+            alert('Auditando item com ID: ' + index);
+        }
+
+        // Carregar os itens ao carregar a página
         window.onload = carregarEstoque;
     </script>
 </body>

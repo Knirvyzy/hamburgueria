@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamburgueria - Menu Principal</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Verdana, sans-serif;
+            background-color: #003366;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            row-gap: 20px;
+        }
+
+        .section {
+            background-color: white;
+            color: #003366;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        .section h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .section a {
+            text-decoration: none;
+            color: white;
+            background-color: #003366;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .section a:hover {
+            background-color: #002244;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Menu Principal da Hamburgueria</h1>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Cadastro Section -->
+            <div class="section">
+                <h2>Cadastro</h2>
+                <a href="cadastro-estoque.html" target="_blank">Cadastro de Estoque</a>
+                <a href="cadastro-produtos.html" target="_blank">Cadastro de Produto</a>
+                <a href="cadastro-vendas.html" target="_blank">Cadastro de Vendas</a>
+                <a href="cadastro-compras.html" target="_blank">Cadastro de Compras</a>
+                <a href="cadastro-folha.html" target="_blank">Cadastro de Folha de pagamentos</a>
+                <a href="cadastro-impostos.html" target="_blank">Cadastro de Impostos</a>
+                <a href="cadastro-cliente.html" target="_blank">Cadastro de Cliente</a>
+            </div>
+
+            <!-- Controle Section -->
+            <div class="section">
+                <h2>Controle</h2>
+                <a href="Controle-produtos.html" target="_blank">Controle de Produtos</a>
+                <a href="Controle-estoque.html" target="_blank">Controle do Estoque</a>
+            </div>
+
+            <!-- Pesquisa Section -->
+            <div class="section">
+                <h2>Pesquisa</h2>
+                <a href="pesquisa-produto.html" target="_blank">Pesquisa de Produto</a>
+                <a href="pesquisa-cliente.html" target="_blank">Pesquisa de Cliente</a>
+            </div>
+
+            <!-- Relatório Section -->
+            <div class="section">
+                <h2>Relatório</h2>
+                <a href="relatorio-vendas.html" target="_blank">Relatório de Vendas</a>
+                <a href="relatorio-estoque.html" target="_blank">Relatório de Estoque</a>
+                <a href="relatorio-receitas-despesas.html" target="_blank">Relatório de Receitas e despesas</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+

@@ -136,16 +136,19 @@
                 let saldoClass = '';
                 let vencidoClass = '';
 
-                // Definir classes primeiro
+                // Definir classes de saldo
                 if (item.quantidade == 0) saldoClass = 'zero-saldo';
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
-                if (diferencaDias >= 4) vencidoClass = 'vencido';
-                else if (diferencaDias >= 0 && diferencaDias < 4) vencidoClass = 'prestes-vencer';
+                // Lógica de vencimento para Consumíveis
+                if (item.categoria === 'Consumíveis') {
+                    if (diferencaDias >= 15) vencidoClass = 'vencido'; // Vencido após 15 dias
+                    else if (diferencaDias >= 0 && diferencaDias < 3) vencidoClass = 'prestes-vencer'; // Prestes a vencer nos próximos 3 dias
+                }
 
                 // Aplicar filtros corretamente
                 if (filtroZeroAtivo && item.quantidade !== 0) return;
-                if (filtroVencidoAtivo && diferencaDias < 4) return;
+                if (filtroVencidoAtivo && diferencaDias < 15 && item.categoria === 'Consumíveis') return;
 
                 const linha = document.createElement('tr');
                 linha.innerHTML = `

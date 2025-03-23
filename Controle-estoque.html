@@ -198,14 +198,28 @@
 
         function alterarQuantidade(index, incremento) {
             const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
-            estoque[index].quantidade += incremento;
-            if (estoque[index].quantidade < 0) estoque[index].quantidade = 0; // Impede quantidade negativa
+            let novaQuantidade = estoque[index].quantidade + incremento;
+            if (novaQuantidade < 0) novaQuantidade = 0; // Impede quantidade negativa
+            estoque[index].quantidade = novaQuantidade;
             localStorage.setItem('estoque', JSON.stringify(estoque));
             carregarEstoque();
         }
 
         function audit(index) {
-            alert(`Auditando item ID: ${index}`);
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            const quantidadeAtual = estoque[index].quantidade;
+            const novoTotal = prompt(`Informe a nova quantidade para o item ${estoque[index].item} (quantidade atual: ${quantidadeAtual}):`, quantidadeAtual);
+            
+            if (novoTotal !== null) {
+                const novaQuantidade = parseInt(novoTotal, 10);
+                if (!isNaN(novaQuantidade)) {
+                    estoque[index].quantidade = novaQuantidade;
+                    localStorage.setItem('estoque', JSON.stringify(estoque));
+                    carregarEstoque();
+                } else {
+                    alert('Por favor, insira um número válido.');
+                }
+            }
         }
 
         window.onload = carregarEstoque;

@@ -64,7 +64,7 @@
         .zero-saldo { color: red; }
         .baixo-saldo { color: #FF6F00; } /* Laranja */
         .vencido { border: 2px solid red; }
-        .prestes-vencer { border: 2px solid red; }
+        .prestes-vencer { border: 2px solid orange; }
         .active-filter, .active-filter:active { 
             border: 3px solid #003366 !important; 
             background-color: #0056b3 !important; 
@@ -187,6 +187,25 @@
             document.querySelectorAll('#estoqueLista tr').forEach(linha => {
                 linha.style.display = linha.innerText.toLowerCase().includes(filtro) ? '' : 'none';
             });
+        }
+
+        function excluirItem(index) {
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            estoque.splice(index, 1);
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            carregarEstoque();
+        }
+
+        function alterarQuantidade(index, incremento) {
+            const estoque = JSON.parse(localStorage.getItem('estoque')) || [];
+            estoque[index].quantidade += incremento;
+            if (estoque[index].quantidade < 0) estoque[index].quantidade = 0; // Impede quantidade negativa
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            carregarEstoque();
+        }
+
+        function audit(index) {
+            alert(`Auditando item ID: ${index}`);
         }
 
         window.onload = carregarEstoque;

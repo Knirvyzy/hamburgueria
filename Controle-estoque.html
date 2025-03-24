@@ -54,13 +54,16 @@
         #filterZero, #filterVencido {
             min-width: 120px; /* Aumentando a largura */
         }
-         button:focus { 
-             outline: none; 
-        } 
-         button:active { transform: scale(0.98); 
-          }
-       
-       .small-btn {
+
+        button:focus { 
+            outline: none; 
+        }
+
+        button:active { 
+            transform: scale(0.98); 
+        }
+
+        .small-btn {
             padding: 5px 8px;
             width: 80px;
         }
@@ -71,10 +74,10 @@
         .prestes-vencer { border: 2px solid orange; }
 
         .active-filter, .active-filter:active { 
-             border: 3px solid #003366 !important; 
+            border: 3px solid #003366 !important; 
             background-color: #0056b3 !important; 
             color: white !important; 
-       }
+        }
 
         header {
             background-color: #003366; /* Azul escuro */
@@ -134,14 +137,14 @@
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
                 let vencidoClass = '';
-                if (item.categoria === "Consumível") {
-                    if (filtroVencidoAtivo && dataVencimento < dataAtual) {
-                        vencidoClass = 'vencido';
-                    } else if (diferencaDias <= 10 && diferencaDias > 0) {
-                        vencidoClass = 'prestes-vencer';
-                    }
+                if (filtroVencidoAtivo && dataVencimento < dataAtual) { 
+                    vencidoClass = 'vencido';
                 }
-
+                if (dataVencimento < dataAtual && diferencaDias <= 10) { 
+                    vencidoClass = 'vencido'; 
+                } else if (diferencaDias <= 8) { 
+                    vencidoClass = 'prestes-vencer'; 
+                }
                 if (filtroZeroAtivo && item.quantidade !== 0) return;
                 if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
 
@@ -155,12 +158,14 @@
                     <td class="${saldoClass}" id="unidade-${index}">${item.unidade}</td>
                     <td class="${saldoClass}" id="valor-${index}">${item.valor}</td>
                     <td class="${vencidoClass} ${saldoClass}" id="lote-${index}">${item.lote}</td>
-                    <td><div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                        <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="excluirItem(${index})">
-                        <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
-                        <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
-                        <button class="small-btn" onclick="audit(${index})">Audit</button>
-                    </div></td>
+                    <td>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                            <img src="Imagens/Lixeira-aberta.png" class="delete-icon" onclick="confirmarExcluirItem(${index})">
+                            <button class="small-btn" onclick="alterarQuantidade(${index}, 1)">+</button>
+                            <button class="small-btn" onclick="alterarQuantidade(${index}, -1)">-</button>
+                            <button class="small-btn" onclick="audit(${index})">Audit</button>
+                        </div>
+                    </td>
                 `;
                 tabelaBody.appendChild(linha);
             });
@@ -192,8 +197,13 @@
             localStorage.setItem('historico', JSON.stringify(historico));
         }
 
+        function confirmarExcluirItem(index) {
+            if (confirm("Deseja realmente excluir este item?")) {
+                excluirItem(index);
+            }
+        }
+
         function excluirItem(index) {
-            if (!confirm("Deseja mesmo excluir?")) return;
             let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             registrarMovimentacao(estoque[index].id, -estoque[index].quantidade);
             estoque.splice(index, 1);

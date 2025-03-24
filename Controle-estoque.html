@@ -68,7 +68,7 @@
         .zero-saldo { color: red; }
         .baixo-saldo { color: #FF6F00; } /* Laranja */
         .vencido { border: 2px solid red; }
-        .prestes-vencer { border: 2px solid red; }
+        .prestes-vencer { border: 2px solid orange; }
 
         .active-filter, .active-filter:active { 
              border: 3px solid #003366 !important; 
@@ -134,15 +134,16 @@
                 else if (item.quantidade < 5) saldoClass = 'baixo-saldo';
 
                 let vencidoClass = '';
-            if (filtroVencidoAtivo && dataVencimento < dataAtual) { vencidoClass = 'vencido';
-        }
-                   if (dataVencimento < dataAtual) { 
-    vencidoClass = 'vencido'; 
-} else if (diferencaDias <= 4) { 
-    vencidoClass = 'prestes-vencer'; 
-}
-           if (filtroZeroAtivo && item.quantidade !== 0) return;
-if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
+                if (item.categoria === "Consumível") {
+                    if (filtroVencidoAtivo && dataVencimento < dataAtual) {
+                        vencidoClass = 'vencido';
+                    } else if (diferencaDias <= 10 && diferencaDias > 0) {
+                        vencidoClass = 'prestes-vencer';
+                    }
+                }
+
+                if (filtroZeroAtivo && item.quantidade !== 0) return;
+                if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
 
                 const linha = document.createElement('tr');
                 linha.innerHTML = `
@@ -192,6 +193,7 @@ if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
         }
 
         function excluirItem(index) {
+            if (!confirm("Deseja mesmo excluir?")) return;
             let estoque = JSON.parse(localStorage.getItem('estoque')) || [];
             registrarMovimentacao(estoque[index].id, -estoque[index].quantidade);
             estoque.splice(index, 1);
@@ -222,3 +224,4 @@ if (filtroVencidoAtivo && dataVencimento >= dataAtual) return;
     </script>
 </body>
 </html>
+
